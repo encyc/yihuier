@@ -1,5 +1,5 @@
 # 在 main.py 或者 __init__.py 中创建主类 Yihui
-from eda_module import EDAModule
+from eda import EDAModule
 import pandas as pd
 
 class Yihui:
@@ -22,11 +22,12 @@ class Yihui:
 # 在主程序中使用 Yihui 类
 if __name__ == "__main__":
     # 假设 data 是你的数据
-    with open("data/data.csv", "r") as f:
+    with open("data.csv", "r") as f:
         data = pd.read_csv(f)
 
     # 创建 Yihui 类的实例
     yihui_project = Yihui(data)
+    print(yihui_project.data.head())
 
     # 直接访问 Yihui 类的属性获取字符型和数值型变量的名字
     categorical_vars_list = yihui_project.categorical_vars
