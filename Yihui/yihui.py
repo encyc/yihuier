@@ -1,6 +1,6 @@
 from Yihui.eda import EDAModule
 from Yihui.dataprocessing import DataProcessingModule
-
+from Yihui.cluster import ClusterMuodule
 
 # 导入相关库
 
@@ -13,6 +13,7 @@ class Yihui:
         self.numeric_vars = self.get_numeric_variables()
         self.eda_module = EDAModule(data, target)
         self.dp_module = DataProcessingModule(data, target)
+        self.cluster_module = ClusterMuodule(data, target)
         # 其他模块的初始化...
 
     # 提取字符型变量的名字并返回一个list
