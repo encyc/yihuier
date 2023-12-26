@@ -164,3 +164,27 @@ class DataProcessingModule:
         data2 = data2.drop(obs_to_remove, axis=0)
         print('含有超过{}个缺失值的样本数量为{}'.format(threshold, len(obs_to_remove)))
         return data2
+
+    # 常变量/同值化处理
+    def const_delete(self, threshold=0.9):
+        """
+        删除常变量/同值化处理
+
+        Parameters:
+        - threshold: 同值化处理的阈值，默认为 0.9
+
+        Returns:
+        删除常变量/同值化处理后的数据集
+        """
+        # 计算每一列中唯一值的比例
+        unique_ratio = self.data.nunique() / len(self.data)
+
+        # 找到同值比例超过阈值的列
+        const_columns = unique_ratio[unique_ratio >= threshold].index
+
+        # 删除常变量/同值化处理后的数据集
+        data_after_const_delete = self.data.drop(columns=const_columns)
+
+        print('删除常变量/同值化处理后的变量个数为{},名字为{}'.format(len(const_columns),const_columns))
+        return data_after_const_delete
+

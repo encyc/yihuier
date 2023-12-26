@@ -31,35 +31,40 @@ if __name__ == "__main__":
     categorical_vars_list = yihui_project.categorical_vars
     numeric_vars_list = yihui_project.numeric_vars
 
-    ### eda 阶段
-
-    # 使用ydata_profiling 自动生成eda报告
-    # 根据dataset数据量大小，生成报告的时间会不同。建议慎重操作。
+    # ### eda 阶段
+    #
+    # # 使用ydata_profiling 自动生成eda报告
+    # # 根据dataset数据量大小，生成报告的时间会不同。建议慎重操作。
     # yihui_project.eda_module.auto_eda_profiling()
-
-    # 手动查看变量分布情况
+    #
+    # # 手动查看变量分布情况
     # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='hist',plt_size=(100,100),plt_num=100,x=10,y=10)
     # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='box',plt_size=(100,100),plt_num=100,x=10,y=10)
     # yihui_project.eda_module.plot_cate_var(categorical_vars_list,plt_size=(100,100),plt_num=100,x=10,y=10)
-
-    # 数值型变量的违约率分析
+    #
+    # # 数值型变量的违约率分析
     # yihui_project.eda_module.plot_default_num(numeric_vars_list,q=10,plt_size=(100,100),plt_num=100,x=10,y=10)
-
-    # 类别型变量的违约率分析
+    #
+    # # 类别型变量的违约率分析
     # yihui_project.eda_module.plot_default_cate(categorical_vars_list,plt_size=(10,10),plt_num=1,x=1,y=1)
-
-
-    ### data processing 阶段
-
-    # 所有变量缺失值分布图
+    #
+    #
+    # ### data processing 阶段
+    #
+    # # 所有变量缺失值分布图
     # print(yihui_project.dp_module.plot_bar_missing_var())
-
-    # 使用 '0','median','class','rf'
+    #
+    # # 使用 '0','median','class','rf'
     # yihui_project.data = yihui_project.dp_module.fillna_num_var(numeric_vars_list, fill_type='0')
-
+    #
     # yihui_project.data = yihui_project.dp_module.fillna_cate_var(categorical_vars_list, fill_type='class', fill_str='missing')
     # yihui_project.data = yihui_project.dp_module.fillna_cate_var(categorical_vars_list, fill_type='mode')
-
-    # 缺失值剔除
+    #
+    # # 缺失值剔除
     # yihui_project.data = yihui_project.dp_module.delete_missing_var()
-    print(yihui_project.dp_module.delete_missing_obs(threshold=105))
+    # yihui_project.data = yihui_project.dp_module.delete_missing_obs(threshold=0.2)
+    #
+    # # 常变量/同值化处理
+    # yihui_project.dp_module.const_delete(threshold=0.9)
+
+
