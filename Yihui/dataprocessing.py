@@ -8,41 +8,37 @@ class DataProcessingModule:
         self.data = data
         self.target = target
 
-    def missing_cal(self):
+    def __missing_var_cal(self):
         """
-        calculate data missing pct
+        calculate var missing pct
         """
-        missing_series = self.data.isnull().sum() / self.data.shape[0]
-        missing_data = pd.DataFrame(missing_series).reset_index()
-        missing_data = missing_data.rename(columns={'index': 'col',
-                                                0: 'missing_pct'})
-        missing_data = missing_data.sort_values('missing_pct', ascending=False)
-        return missing_data.sort_values('missing_pct', ascending=False)
+        total = self.data.shape[0]
+        missing_count = self.data.isnull().sum()
+        missing_pct = missing_count/total
+        missing_data = pd.DataFrame({
+            'index': self.data.columns.tolist(),
+            'total_obs': total,
+            'missing_count': missing_count,
+            'missing_pct': missing_pct
+        })
+        return missing_data
+
+    def __missing_obs_cal(self):
+        """
+        calculate obs missing pct
+        """
+        total = len(self.data.columns)
+        missing_count = self.data.isnull().sum(axis=1)
+        missing_pct = missing_count / total
+        missing_data = pd.DataFrame({
+            'index': self.data.index.tolist(),
+            'total_obs': total,
+            'missing_count': missing_count,
+            'missing_pct': missing_pct
+        })
+        return missing_data
 
 
-    # def plot_hist_missing_var(self, plt_size=None):
-    #     """
-    #     plt_size: plot chart size: (10, 10)
-    #
-    #     return: hist chart of missing variables
-    #     """
-    #     missing_data = self.missing_cal()
-    #     if plt_size is not None:
-    #         plt.figure(figsize=plt_size)
-    #     else:
-    #         plt.figure()
-    #     plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
-    #     plt.rcParams['axes.unicode_minus'] = False
-    #
-    #     x = missing_data['missing_pct']
-    #     bins = np.arange(0, 1.1, 0.1)
-    #
-    #     plt.hist(x=x, bins=bins, color='hotpink', edgecolor='k', alpha=0.8)
-    #     plt.title('缺失值分布')
-    #     plt.ylabel('缺失值个数')
-    #     plt.xlabel('缺失率')
-    #
-    #     plt.show()
 
     # 所有变量缺失值分布图
     def plot_bar_missing_var(self, plt_size=None):
@@ -51,7 +47,7 @@ class DataProcessingModule:
 
         return: bar chart of missing variables
         """
-        missing_data = self.missing_cal()  # 假设 missing_cal() 返回一个 DataFrame，包含 'col' 和 'missing_pct' 列
+        missing_data = self.__missing_var_cal()
 
         if plt_size is not None:
             plt.figure(figsize=plt_size)
@@ -72,6 +68,12 @@ class DataProcessingModule:
 
         plt.show()
 
+    # TODO:
+    #* 单个样本缺失值分布图
+    # def plot_bar_missing_obs(self):
+        
+
+
     # 缺失值填充（类别型变量）
     def fillna_cate_var(self, col_list, fill_type=None, fill_str=None):
         """
@@ -81,11 +83,13 @@ class DataProcessingModule:
 
         return :填充后的数据集
         """
+        data2 = self.data.copy()
         for col in col_list:
             if fill_type == 'class':
-                self.data[col] = self.data[col].fillna(fill_str)
+                data2[col] = data2[col].fillna(fill_str)
             if fill_type == 'mode':
-                self.data[col] = self.data[col].fillna(self.data[col].mode()[0])
+                data2[col] = data2[col].fillna(data2[col].mode()[0])
+        return data2
 
     # 数值型变量的填充
     # 针对缺失率在5%以下的变量用中位数填充
@@ -123,7 +127,7 @@ class DataProcessingModule:
         return data2
 
     # 缺失值剔除（单个变量）
-    def delete_missing_var(self, threshold=None):
+    def delete_missing_var(self, col_list, threshold=None):
         """
         data:数据集
         threshold:缺失率删除的阈值
@@ -131,9 +135,32 @@ class DataProcessingModule:
         return :删除缺失后的数据集
         """
         data2 = self.data.copy()
-        missing_data = self.missing_cal()
+        missing_data = self.__missing_var_cal()
         missing_col_num = missing_data[missing_data.missing_pct >= threshold].shape[0]
         missing_col = list(missing_data[missing_data.missing_pct >= threshold].col)
-        self.data = data2.drop(missing_col, axis=1)
+        data2 = data2.drop(missing_col, axis=1)
         print('缺失率超过{}的变量个数为{}'.format(threshold, missing_col_num))
+        return data2
 
+    def delete_missing_obs(self, threshold=None):
+        """
+        删除包含超过阈值数量的缺失值的 observation
+
+        Parameters:
+        - threshold: 允许的最大缺失变量数量
+
+        Returns:
+        删除缺失后的数据集
+        """
+        data2 = self.data.copy()
+        # 计算每个 observation 中缺失值的数量
+        missing_data = self.__missing_obs_cal()
+
+        # 找到缺失值数量超过阈值的 observation 的索引
+        if threshold >= 1:
+            obs_to_remove = missing_data[missing_data['missing_count'] >= threshold].index
+        else:
+            obs_to_remove = missing_data[missing_data['missing_pct'] >= threshold].index
+        data2 = data2.drop(obs_to_remove, axis=0)
+        print('含有超过{}个缺失值的样本数量为{}'.format(threshold, len(obs_to_remove)))
+        return data2
