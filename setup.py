@@ -2,14 +2,14 @@ from setuptools import setup
 from setuptools import find_packages
 
 
-VERSION = '0.1.2'
+VERSION = '0.1.4'
 
 with open("README.md", "r", encoding='utf-8') as fh:
     long_description = fh.read()
 
 setup(
     name='Yihui',  # package name
-    version='0.1.1',  # package version
+    version=VERSION,  # package version
     author='encyc',
     author_email='atomyuangao@gmail.com',
     description='Package for Logistic Regression Modeling, focus on Credit Risk Management',  # package description
@@ -24,6 +24,14 @@ setup(
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent"
+    ],
+    install_requires=[
+        'pandas',
+        'numpy',
+        'matplotlib',
+        'seaborn',
+        'scikit-learn',
+        'ydata_profiling==4.6.3',
     ]
 
 )
