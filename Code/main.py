@@ -12,7 +12,7 @@ if __name__ == "__main__":
     warnings.filterwarnings('ignore')
 
     # generate data.csv
-    with open("data.csv", "r") as f:
+    with open("../Data/data.csv", "r") as f:
         data = pd.read_csv(f)
     data['customer_no'] = str(data['customer_no'])
 
