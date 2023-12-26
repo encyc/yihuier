@@ -2,7 +2,7 @@
 import warnings
 import pandas as pd
 
-from Code.yihui import Yihui
+from Yihui.yihui import Yihui
 
 
 
@@ -36,6 +36,7 @@ if __name__ == "__main__":
     # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='hist',hspace=0.4,wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
     # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='box',hspace=0.4,wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
 
+    yihui_project.eda_module.plot_cate_var(categorical_vars_list,hspace=0.4, wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
 
 
     # eda_module.plot_default_num

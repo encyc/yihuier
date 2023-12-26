@@ -1,6 +1,6 @@
 
 
-from Code.eda import EDAModule
+from Yihui.eda import EDAModule
 
 
 # 导入相关库
