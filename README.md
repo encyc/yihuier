@@ -28,6 +28,9 @@ author: JustinGao
 * plot_default_cate -- 类别型变量的违约率分析
 * plot_default_num  -- 数值型变量的违约率分析
 
+3. 自动EDA
+* 使用ydata_profiling自动分析数据集
+
 ### 2. dataprocessing.py
 
 1. 缺失值处理
@@ -44,9 +47,6 @@ author: JustinGao
 
 * const_delete -- 常变量/同值化处理
 
-3. 降基处理
-
-* descending_cate -- 类别型变量的降基处理
 
 ### 3. Cluster.py
 
