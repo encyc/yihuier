@@ -31,28 +31,35 @@ if __name__ == "__main__":
     categorical_vars_list = yihui_project.categorical_vars
     numeric_vars_list = yihui_project.numeric_vars
 
-    ### eda stage
+    ### eda 阶段
 
+    # 使用ydata_profiling 自动生成eda报告
+    # 根据dataset数据量大小，生成报告的时间会不同。建议慎重操作。
     # yihui_project.eda_module.auto_eda_profiling()
 
-    # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='hist',hspace=0.4,wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
-    # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='box',hspace=0.4,wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
-    # yihui_project.eda_module.plot_cate_var(categorical_vars_list,hspace=0.4, wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
+    # 手动查看变量分布情况
+    # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='hist',plt_size=(100,100),plt_num=100,x=10,y=10)
+    # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='box',plt_size=(100,100),plt_num=100,x=10,y=10)
+    # yihui_project.eda_module.plot_cate_var(categorical_vars_list,plt_size=(100,100),plt_num=100,x=10,y=10)
+
+    # 数值型变量的违约率分析
+    # yihui_project.eda_module.plot_default_num(numeric_vars_list,q=10,plt_size=(100,100),plt_num=100,x=10,y=10)
+
+    # 类别型变量的违约率分析
+    # yihui_project.eda_module.plot_default_cate(categorical_vars_list,plt_size=(10,10),plt_num=1,x=1,y=1)
 
 
-    # eda_module.plot_default_num
-    # yihui_project.eda_module.plot_default_num(numeric_vars_list,hspace=0.4,wspace=0.4,q=10,plt_size=(100,100),plt_num=100,x=10,y=10)
+    ### data processing 阶段
 
-    # eda_module.plot_default_cate
-    # yihui_project.eda_module.plot_default_cate(categorical_vars_list,hspace=0.4,wspace=0.4,plt_size=(10,10),plt_num=1,x=1,y=1)
-
-
-    ### data processing stage
-
-    # print(yihui_project.dp_module.missing_cal())
+    # 所有变量缺失值分布图
     # print(yihui_project.dp_module.plot_bar_missing_var())
 
-    # fill_type in types like '0','median','class','rf'
-    yihui_project.data = yihui_project.dp_module.fillna_num_var(numeric_vars_list, fill_type='0')
+    # 使用 '0','median','class','rf'
+    # yihui_project.data = yihui_project.dp_module.fillna_num_var(numeric_vars_list, fill_type='0')
 
-    yihui_project.data = yihui_project.dp_module.fillna_cate_var(categorical_vars_list, fill_type='class')
+    # yihui_project.data = yihui_project.dp_module.fillna_cate_var(categorical_vars_list, fill_type='class', fill_str='missing')
+    # yihui_project.data = yihui_project.dp_module.fillna_cate_var(categorical_vars_list, fill_type='mode')
+
+    # 缺失值剔除
+    # yihui_project.data = yihui_project.dp_module.delete_missing_var()
+    print(yihui_project.dp_module.delete_missing_obs(threshold=105))
