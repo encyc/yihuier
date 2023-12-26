@@ -31,12 +31,13 @@ if __name__ == "__main__":
     categorical_vars_list = yihui_project.categorical_vars
     numeric_vars_list = yihui_project.numeric_vars
 
+    ### eda stage
+
     # yihui_project.eda_module.auto_eda_profiling()
 
     # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='hist',hspace=0.4,wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
     # yihui_project.eda_module.plot_num_col(numeric_vars_list,plt_type='box',hspace=0.4,wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
-
-    yihui_project.eda_module.plot_cate_var(categorical_vars_list,hspace=0.4, wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
+    # yihui_project.eda_module.plot_cate_var(categorical_vars_list,hspace=0.4, wspace=0.4,plt_size=(100,100),plt_num=100,x=10,y=10)
 
 
     # eda_module.plot_default_num
@@ -44,3 +45,14 @@ if __name__ == "__main__":
 
     # eda_module.plot_default_cate
     # yihui_project.eda_module.plot_default_cate(categorical_vars_list,hspace=0.4,wspace=0.4,plt_size=(10,10),plt_num=1,x=1,y=1)
+
+
+    ### data processing stage
+
+    # print(yihui_project.dp_module.missing_cal())
+    # print(yihui_project.dp_module.plot_bar_missing_var())
+
+    # fill_type in types like '0','median','class','rf'
+    yihui_project.data = yihui_project.dp_module.fillna_num_var(numeric_vars_list, fill_type='0')
+
+    yihui_project.data = yihui_project.dp_module.fillna_cate_var(categorical_vars_list, fill_type='class')
