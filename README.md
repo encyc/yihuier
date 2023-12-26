@@ -48,7 +48,7 @@ author: JustinGao
 * const_delete -- 常变量/同值化处理
 
 
-### 3. Cluster.py
+### 3. cluster.py
 
 * cluster_AffinityPropagation       --#亲和力传播
 * cluster_AgglomerativeClustering   --#聚合

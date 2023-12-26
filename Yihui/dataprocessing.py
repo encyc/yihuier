@@ -57,7 +57,7 @@ class DataProcessingModule:
         plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
         plt.rcParams['axes.unicode_minus'] = False
 
-        x = missing_data['col']
+        x = missing_data['index']
         y = missing_data['missing_pct']
 
         plt.bar(x, y, color='hotpink', edgecolor='k', alpha=0.8)
@@ -127,7 +127,7 @@ class DataProcessingModule:
         return data2
 
     # 缺失值剔除（单个变量）
-    def delete_missing_var(self, col_list, threshold=None):
+    def delete_missing_var(self, threshold=None):
         """
         data:数据集
         threshold:缺失率删除的阈值
@@ -137,7 +137,7 @@ class DataProcessingModule:
         data2 = self.data.copy()
         missing_data = self.__missing_var_cal()
         missing_col_num = missing_data[missing_data.missing_pct >= threshold].shape[0]
-        missing_col = list(missing_data[missing_data.missing_pct >= threshold].col)
+        missing_col = list(missing_data[missing_data.missing_pct >= threshold].index)
         data2 = data2.drop(missing_col, axis=1)
         print('缺失率超过{}的变量个数为{}'.format(threshold, missing_col_num))
         return data2
