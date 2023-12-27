@@ -7,14 +7,14 @@ from scipy.stats import spearmanr
 
 # 01 计算IV
 def iv_count(data, var, target, weight):
-    ''' 计算iv值
+    """ 计算iv值
     Args:
         data: DataFrame，拟操作的数据集
         var: String，拟计算IV值的变量名称
         target: String，Y列名称
     Returns:
         IV值， float
-    '''
+    """
     # 获取变量的唯一值
     value_list = set(list(np.unique(data[var])))
     iv = 0
