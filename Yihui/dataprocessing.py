@@ -4,19 +4,18 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 
 class DataProcessingModule:
-    def __init__(self, data, target):
-        self.data = data
-        self.target = target
+    def __init__(self, yihui_instance):
+        self.yihui_instance = yihui_instance
 
     def __missing_var_cal(self):
         """
         calculate var missing pct
         """
-        total = self.data.shape[0]
-        missing_count = self.data.isnull().sum()
+        total = self.yihui_instance.data.shape[0]
+        missing_count = self.yihui_instance.data.isnull().sum()
         missing_pct = missing_count/total
         missing_data = pd.DataFrame({
-            'index': self.data.columns.tolist(),
+            'index': self.yihui_instance.data.columns.tolist(),
             'total_obs': total,
             'missing_count': missing_count,
             'missing_pct': missing_pct
@@ -27,15 +26,16 @@ class DataProcessingModule:
         """
         calculate obs missing pct
         """
-        total = len(self.data.columns)
-        missing_count = self.data.isnull().sum(axis=1)
+        total = len(self.yihui_instance.data.columns)
+        missing_count = self.yihui_instance.data.isnull().sum(axis=1)
         missing_pct = missing_count / total
         missing_data = pd.DataFrame({
-            'index': self.data.index.tolist(),
+            'index': self.yihui_instance.data.index.tolist(),
             'total_obs': total,
             'missing_count': missing_count,
             'missing_pct': missing_pct
         })
+        print(missing_data)
         return missing_data
 
 
@@ -48,7 +48,8 @@ class DataProcessingModule:
         return: bar chart of missing variables
         """
         missing_data = self.__missing_var_cal()
-
+        print('plot_bar')
+        print(missing_data)
         if plt_size is not None:
             plt.figure(figsize=plt_size)
         else:
@@ -83,7 +84,7 @@ class DataProcessingModule:
 
         return :填充后的数据集
         """
-        data2 = self.data.copy()
+        data2 = self.yihui_instance.data.copy()
         for col in col_list:
             if fill_type == 'class':
                 data2[col] = data2[col].fillna(fill_str)
@@ -105,7 +106,7 @@ class DataProcessingModule:
 
         return:已填充好的数据集
         """
-        data2 = self.data.copy()
+        data2 = self.yihui_instance.data.copy()
         for col in col_list:
             if fill_type == '0':
                 data2[col] = data2[col].fillna(0)
@@ -134,7 +135,7 @@ class DataProcessingModule:
 
         return :删除缺失后的数据集
         """
-        data2 = self.data.copy()
+        data2 = self.yihui_instance.data.copy()
         missing_data = self.__missing_var_cal()
         missing_col_num = missing_data[missing_data.missing_pct >= threshold].shape[0]
         missing_col = list(missing_data[missing_data.missing_pct >= threshold].index)
@@ -152,7 +153,7 @@ class DataProcessingModule:
         Returns:
         删除缺失后的数据集
         """
-        data2 = self.data.copy()
+        data2 = self.yihui_instance.data.copy()
         # 计算每个 observation 中缺失值的数量
         missing_data = self.__missing_obs_cal()
 
@@ -177,13 +178,13 @@ class DataProcessingModule:
         删除常变量/同值化处理后的数据集
         """
         # 计算每一列中唯一值的比例
-        unique_ratio = self.data.nunique() / len(self.data)
+        unique_ratio = self.yihui_instance.data.nunique() / len(self.yihui_instance.data)
 
         # 找到同值比例超过阈值的列
         const_columns = unique_ratio[unique_ratio >= threshold].index
 
         # 删除常变量/同值化处理后的数据集
-        data_after_const_delete = self.data.drop(columns=const_columns)
+        data_after_const_delete = self.yihui_instance.data.drop(columns=const_columns)
 
         print('删除常变量/同值化处理后的变量个数为{},名字为{}'.format(len(const_columns),const_columns))
         return data_after_const_delete

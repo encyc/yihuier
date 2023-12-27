@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # # 类别型变量的违约率分析
     # yihui_project.eda_module.plot_default_cate(categorical_vars_list,plt_size=(10,10),plt_num=1,x=1,y=1)
     #
-    #
+
     ### data processing 阶段
 
     # 所有变量缺失值分布图
@@ -73,4 +73,4 @@ if __name__ == "__main__":
 
     # cluster 阶段
 
-    yihui_project.cluster_module.cluster_AffinityPropagation(['v3','v5'])
+    # yihui_project.cluster_module.cluster_AffinityPropagation(['v3','v5'])

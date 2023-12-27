@@ -3,24 +3,24 @@ import pandas as pd
 import seaborn as sns
 from ydata_profiling import ProfileReport
 
+
 class EDAModule:
-    def __init__(self, data, target):
-        self.data = data
-        self.target = target
+    def __init__(self, yihui_instance):
+        self.yihui_instance = yihui_instance
 
     def auto_eda_profiling(self):
         # 使用pandas profiling进行自动EDA
-        profile = ProfileReport(self.data,
+        profile = ProfileReport(self.yihui_instance.yihui_instance.data,
                                 title="Report",
-                                correlations={"auto": {"calculate":False}},
+                                correlations={"auto": {"calculate": False}},
                                 missing_diagrams={"Heatmap": False}
-                                ) # object created
+                                )  # object created
         profile.to_file(output_file='../Data/output.html')
 
     # 类别型变量的分布
     def plot_cate_var(self, col_list, hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None, y=None):
         """
-        self.data:数据集
+        self.yihui_instance.data:数据集
         col_list:变量list集合
         hspace :子图之间的间隔(y轴方向)
         wspace :子图之间的间隔(x轴方向)
@@ -38,12 +38,13 @@ class EDAModule:
         for i, col in zip(range(1, plt_num + 1, 1), col_list):
             plt.subplot(x, y, i)
             plt.title(col)
-            sns.countplot(data=self.data, y=col)
+            sns.countplot(data=self.yihui_instance.data, y=col)
             plt.ylabel('')
         return plt.show()
 
     # 数值型变量的分布
-    def plot_num_col(self, col_list, plt_type='hist', hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None, y=None):
+    def plot_num_col(self, col_list, plt_type='hist', hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None,
+                     y=None):
         """
         col_list:变量list集合
         hspace :子图之间的间隔(y轴方向)
@@ -62,13 +63,13 @@ class EDAModule:
             for i, col in zip(range(1, plt_num + 1, 1), col_list):
                 plt.subplot(x, y, i)
                 plt.title(col)
-                sns.distplot(self.data[col].dropna())
+                sns.distplot(self.yihui_instance.data[col].dropna())
                 plt.xlabel('')
         if plt_type == 'box':
             for i, col in zip(range(1, plt_num + 1, 1), col_list):
                 plt.subplot(x, y, i)
                 plt.title(col)
-                sns.boxplot(data=self.data, x=col, fliersize=5,
+                sns.boxplot(data=self.yihui_instance.data, x=col, fliersize=5,
                             flierprops={'markerfacecolor': 'cornflowerblue', 'markeredgecolor': 'cornflowerblue',
                                         'markersize': 4}, )
                 plt.xlabel('')
@@ -76,7 +77,7 @@ class EDAModule:
             for i, col in zip(range(1, plt_num + 1, 1), col_list):
                 plt.subplot(x, y, i)
                 plt.title(col)
-                sns.stripplot(data=self.data, x=col)
+                sns.stripplot(data=self.yihui_instance.data, x=col)
                 plt.xlabel('')
         return plt.show()
 
@@ -94,8 +95,8 @@ class EDAModule:
         return :违约率分布图（柱状图形式）
         """
 
-        all_bad = self.data[self.target].sum()
-        total = self.data[self.target].count()
+        all_bad = self.yihui_instance.data[self.yihui_instance.target].sum()
+        total = self.yihui_instance.data[self.yihui_instance.target].count()
         all_default_rate = all_bad * 1.0 / total
 
         plt.figure(figsize=plt_size)
@@ -103,10 +104,10 @@ class EDAModule:
         plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
         plt.rcParams['axes.unicode_minus'] = False
         for i, col in zip(range(1, plt_num + 1, 1), col_list):
-            d1 = self.data.groupby(col)
+            d1 = self.yihui_instance.data.groupby(col)
             d2 = pd.DataFrame()
-            d2['total'] = d1[self.target].count()
-            d2['bad'] = d1[self.target].sum()
+            d2['total'] = d1[self.yihui_instance.target].count()
+            d2['bad'] = d1[self.yihui_instance.target].sum()
             d2['default_rate'] = d2['bad'] / d2['total']
             d2 = d2.reset_index()
             plt.subplot(x, y, i)
@@ -120,9 +121,9 @@ class EDAModule:
     def plot_default_num(self, col_list, hspace=0.4, wspace=0.4, q=None, plt_size=None, plt_num=None, x=None,
                          y=None):
         """
-        self.data:数据集
+        self.yihui_instance.data:数据集
         col_list:变量list集合
-        self.target ：目标变量的字段名
+        self.yihui_instance.target ：目标变量的字段名
         hspace :子图之间的间隔(y轴方向)
         wspace :子图之间的间隔(x轴方向)
         q :等深分箱的箱体个数
@@ -133,18 +134,18 @@ class EDAModule:
 
         return :违约率分布图（折线图形式）
         """
-        all_bad = self.data[self.target].sum()
-        total = self.data[self.target].count()
+        all_bad = self.yihui_instance.data[self.yihui_instance.target].sum()
+        total = self.yihui_instance.data[self.yihui_instance.target].count()
         all_default_rate = all_bad * 1.0 / total
 
         plt.figure(figsize=plt_size)
         plt.subplots_adjust(hspace=hspace, wspace=wspace)
         for i, col in zip(range(1, plt_num + 1, 1), col_list):
-            bucket = pd.qcut(self.data[col], q=q, duplicates='drop')
-            d1 = self.data.groupby(bucket)
+            bucket = pd.qcut(self.yihui_instance.data[col], q=q, duplicates='drop')
+            d1 = self.yihui_instance.data.groupby(bucket)
             d2 = pd.DataFrame()
-            d2['total'] = d1[self.target].count()
-            d2['bad'] = d1[self.target].sum()
+            d2['total'] = d1[self.yihui_instance.target].count()
+            d2['bad'] = d1[self.yihui_instance.target].sum()
             d2['default_rate'] = d2['bad'] / d2['total']
             d2 = d2.reset_index()
             plt.subplot(x, y, i)
