@@ -34,13 +34,13 @@ class ClusterMuodule():
         '''
         # 定义模型
         df = self.data
-        x = np.array(df[col_list])
+        X = np.array(df[col_list])
         model = AffinityPropagation(damping=damping)
         # 匹配模型
         print('fitting model')
-        model.fit(x)
+        model.fit(X)
         # 为每个示例分配一个集群
-        d1 = model.predict(x)
+        d1 = model.predict(X)
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
@@ -48,7 +48,7 @@ class ClusterMuodule():
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
-            plt.scatter(x[row_ix, 0], x[row_ix, 1])
+            plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
             plt.show()
 
