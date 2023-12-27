@@ -69,13 +69,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # BIRCH聚类
     # cluster_Birch(df,['v1','v2'],threshold = 0.01, n_clusters = 2)
@@ -97,13 +97,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # DBSCAN聚类
     # cluster_DBSCAN(df,col_list,eps=0.30, min_samples=9)
@@ -125,13 +125,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # K-Means聚类
     # cluster_KMeans(df,col_list,n_clusters=10)
@@ -154,13 +154,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # Mini-Batch K-Means聚类
     # cluster_MiniBatchKMeans(df,col_list,n_clusters = 10)
@@ -184,13 +184,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # 均值飘逸聚类
     # cluster_MeanShift(df,col_list)
@@ -212,13 +212,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # OPTICS聚类
     # cluster_OPTICS(df,col_list,eps=0.8,min_samples=10)
@@ -240,13 +240,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # 光谱聚类
     # cluster_SpectralClustering(df,col_list,n_clusters=10)
@@ -267,13 +267,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters, desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # 高斯混合聚类
     # cluster_GaussianMixture(df,col_list,n_components=10)
@@ -292,10 +292,10 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters,desc='plotting'):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
