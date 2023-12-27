@@ -71,6 +71,11 @@ if __name__ == "__main__":
     # 再检查一下缺失值
     # yihui_project.dp_module.plot_bar_missing_var()
 
-    # cluster 阶段
+    # # cluster 阶段
 
-    yihui_project.cluster_module.cluster_AffinityPropagation(['v1','v2'])
+    # yihui_project.cluster_module.cluster_AffinityPropagation(['v1','v2']) # 非常慢，慎重
+    # yihui_project.cluster_module.cluster_Birch(['v1','v2'])
+    # yihui_project.cluster_module.cluster_GaussianMixture(['v2','v3'])
+    # yihui_project.cluster_module.cluster_KMeans(['v3','v4'])
+
+    #
