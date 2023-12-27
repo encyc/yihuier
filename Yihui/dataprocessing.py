@@ -187,5 +187,21 @@ class DataProcessingModule:
         data_after_const_delete = self.yihui_instance.data.drop(columns=const_columns)
 
         print('删除常变量/同值化处理后的变量个数为{},名字为{}'.format(len(const_columns),const_columns))
+        print(data_after_const_delete.shape[1])
         return data_after_const_delete
 
+    # 缺失目标变量删除
+    def target_missing_delete(self):
+        """
+        删除目标变量为空的观测
+
+        Returns:
+        删除缺失目标变量后的数据集
+        """
+        if self.yihui_instance.target is not None:
+            data_without_missing_target = self.yihui_instance.data.dropna(subset=[self.yihui_instance.target])
+            missing_target_count = len(self.yihui_instance.data) - len(data_without_missing_target)
+            print('删除目标变量缺失的观测数: {}'.format(missing_target_count))
+            return data_without_missing_target
+        else:
+            print('未指定目标变量，无法执行删除操作。')

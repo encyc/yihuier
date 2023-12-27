@@ -9,11 +9,9 @@ class Yihui:
     def __init__(self, data, target=None):
         self.data = data
         self.target = target
-        self.categorical_vars = self.get_categorical_variables()
-        self.numeric_vars = self.get_numeric_variables()
         self.eda_module = EDAModule(self)
         self.dp_module = DataProcessingModule(self)
-        # self.cluster_module = ClusterMuodule(self)
+        self.cluster_module = ClusterMuodule(self)
         # 其他模块的初始化...
 
     # 提取字符型变量的名字并返回一个list
