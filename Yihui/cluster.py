@@ -15,6 +15,7 @@ from sklearn.cluster import OPTICS  # OPTICS
 from sklearn.cluster import SpectralClustering  # 光谱聚合
 from sklearn.mixture import GaussianMixture  # 高斯模糊
 
+from tqdm import tqdm
 
 class ClusterMuodule():
     def __init__(self, yihui_instance):
@@ -23,12 +24,12 @@ class ClusterMuodule():
     # 亲和力传播
     # cluster_AffinityPropagation(df,['v1','v2'],damping = 0.9)
     def cluster_AffinityPropagation(self, col_list, damping=0.9):
-        '''
+        """
         亲和力传播包括找到一组最能概括数据的范例。
         我们设计了一种名为“亲和传播”的方法，它作为两对数据点之间相似度的输入度量。在数据点之间交换实值消息，直到一组高质量的范例和相应的群集逐渐出现。
         它是通过 AffinityPropagation 类实现的.
         要调整的主要配置是将“ 阻尼 ”设置为0.5到1，甚至可能是“首选项”。
-        '''
+        """
         # 定义模型
         df = self.yihui_instance.data
         X = np.array(df[col_list])
@@ -41,13 +42,13 @@ class ClusterMuodule():
         # 检索唯一群集
         clusters = unique(d1)
         # 为每个群集的样本创建散点图
-        for cluster in clusters:
+        for cluster in tqdm(clusters, desc="plotting"):
             # 获取此群集的示例的行索引
             row_ix = where(d1 == cluster)
             # 创建这些样本的散布
             plt.scatter(X[row_ix, 0], X[row_ix, 1])
             # 绘制散点图
-            plt.show()
+        plt.show()
 
     # 聚合聚类
     # cluster_AgglomerativeClustering(df,['v1','v2'],n_clusters = 2)
