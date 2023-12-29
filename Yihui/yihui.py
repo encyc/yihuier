@@ -1,3 +1,4 @@
+from Yihui.binning import BinningModule
 from Yihui.eda import EDAModule
 from Yihui.dataprocessing import DataProcessingModule
 from Yihui.cluster import ClusterMuodule
@@ -12,6 +13,7 @@ class Yihui:
         self.eda_module = EDAModule(self)
         self.dp_module = DataProcessingModule(self)
         self.cluster_module = ClusterMuodule(self)
+        self.binning_module = BinningModule(self)
         # 其他模块的初始化...
 
     # 提取字符型变量的名字并返回一个list

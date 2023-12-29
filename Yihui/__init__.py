@@ -1,7 +1,7 @@
 # 在 main.py 或者 __init__.py 中创建主类 Yihui
 import warnings
 import pandas as pd
-
+import numpy as np
 from Yihui.yihui import Yihui
 
 # 在主程序中使用 Yihui 类
@@ -13,6 +13,7 @@ if __name__ == "__main__":
     with open("../Data/data.csv", "r") as f:
         data = pd.read_csv(f)
     data['customer_no'] = str(data['customer_no'])
+    data['v101'] = np.random.choice(['A', 'B', 'C', 'D', 'E', 'F'], size=len(data))
 
     # loading Titanic dataset
     # data = sns.load_dataset('titanic')
@@ -78,4 +79,8 @@ if __name__ == "__main__":
     # yihui_project.cluster_module.cluster_GaussianMixture(['v2','v3'])
     # yihui_project.cluster_module.cluster_KMeans(['v3','v4'])
 
-    #
+    # yihui_project.binning_module.binning_cate(categorical_vars_list)
+
+    # print(yihui_project.binning_module.bin_df)
+
+    yihui_project.binning_module.binning_num(['v1'], max_bin=20, min_binpct=0, method='ChiMerge')
