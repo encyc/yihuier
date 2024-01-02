@@ -83,4 +83,8 @@ if __name__ == "__main__":
 
     # print(yihui_project.binning_module.bin_df)
 
-    yihui_project.binning_module.binning_num(['v1'], max_bin=20, min_binpct=0, method='ChiMerge')
+    # yihui_project.binning_module.binning_num(yihui_project.get_numeric_variables(), max_bin=20, min_binpct=0, method='ChiMerge')
+    yihui_project.binning_module.binning_num(['v1', 'v2', 'v3', 'v4'], max_bin=20, min_binpct=0, method='ChiMerge')
+
+    yihui_project.binning_module.plot_woe(plt_size=(50,50),plt_num=4,x=2,y=2)
+

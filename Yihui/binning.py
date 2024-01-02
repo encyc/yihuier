@@ -6,7 +6,6 @@ import seaborn as sns
 from scipy.stats import spearmanr
 
 
-
 class BinningModule:
 
     def __init__(self, yihui_instance):
@@ -76,12 +75,13 @@ class BinningModule:
     # 数值型变量的分箱
 
     # 先用卡方分箱输出变量的分割点
-    def __split_data(df2, col, split_num):
+    def __split_data(self, df, col, split_num):
         """
         df: 原始数据集
         col:需要分箱的变量
         split_num:分割点的数量
         """
+        df2 = df.copy()
         count = df2.shape[0]  # 总样本数
         n = math.floor(count / split_num)  # 按照分割点数目等分后每组的样本数
         split_index = [i * n for i in range(1, split_num)]  # 分割点的索引
@@ -90,47 +90,10 @@ class BinningModule:
         split_value = sorted(list(set(split_value)))  # 分割点的value去重排序
         return split_value
 
-
-    def __bin_bad_rate(self, col, target, grant_rate_indicator=0):
-        """
-        df:原始数据集
-        col:原始变量/变量映射后的字段
-        target:目标变量的字段
-        grantRateIndicator:是否输出总体的违约率
-        """
-        df = self.yihui_instance.data
-        total = df.groupby([col])[target].count()
-        bad = df.groupby([col])[target].sum()
-        total_df = pd.DataFrame({'total': total})
-        bad_df = pd.DataFrame({'bad': bad})
-        regroup = pd.merge(total_df, bad_df, left_index=True, right_index=True, how='left')
-        regroup = regroup.reset_index()
-        regroup['bad_rate'] = regroup['bad'] / regroup['total']  # 计算根据col分组后每组的违约率
-        dict_bad = dict(zip(regroup[col], regroup['bad_rate']))  # 转为字典形式
-        if grantRateIndicator == 0:
-            return dict_bad, regroup
-        total_all = df.shape[0]
-        bad_all = df[target].sum()
-        all_bad_rate = bad_all / total_all  # 计算总体的违约率
-        return dict_bad, regroup, all_bad_rate
-
-    def __cal_chi2(self, all_bad_rate):
-        """
-        df:bin_bad_rate得出的regroup
-        all_bad_rate:bin_bad_rate得出的总体违约率
-        """
-        df2 = self.yihui_instance.data.copy()
-
-        df2['expected'] = df2['total'] * all_bad_rate  # 计算每组的坏用户期望数量
-        combined = zip(df2['expected'], df2['bad'])  # 遍历每组的坏用户期望数量和实际数量
-        chi = [(i[0] - i[1]) ** 2 / i[0] for i in combined]  # 计算每组的卡方值
-        chi2 = sum(chi)  # 计算总的卡方值
-        return chi2
-
-    def __assign_group(x, split_bin):
+    def __assign_group(self, x, split_bin):
         """
         x:变量的value
-        split_bin:split_data得出的分割点list
+        split_bin:__split_data得出的分割点list
         """
         n = len(split_bin)
         if x <= min(split_bin):
@@ -141,6 +104,57 @@ class BinningModule:
             for i in range(n - 1):
                 if split_bin[i] < x <= split_bin[i + 1]:  # 如果x在两个分割点之间，则x映射为分割点较大的值
                     return split_bin[i + 1]
+
+    def __bin_bad_rate(self, df, col, target, grantRateIndicator=0):
+        """
+        df:原始数据集
+        col:原始变量/变量映射后的字段
+        target:目标变量的字段
+        grantRateIndicator:是否输出总体的违约率
+        """
+        total = df.groupby([col])[target].count()
+        bad = df.groupby([col])[target].sum()
+        total_df = pd.DataFrame({'total': total})
+        bad_df = pd.DataFrame({'bad': bad})
+        regroup = pd.merge(total_df, bad_df, left_index=True, right_index=True, how='left')
+        regroup = regroup.reset_index()
+        regroup['bad_rate'] = regroup['bad'] / regroup['total']  # 计算根据col分组后每组的违约率
+        dict_bad = dict(zip(regroup[col], regroup['bad_rate']))  # 转为字典形式
+        if grantRateIndicator == 0:
+            return (dict_bad, regroup)
+        total_all = df.shape[0]
+        bad_all = df[target].sum()
+        all_bad_rate = bad_all / total_all  # 计算总体的违约率
+        return (dict_bad, regroup, all_bad_rate)
+
+    # def __cal_chi2(df,all_bad_rate):
+    #     """
+    #     df:__bin_bad_rate得出的regroup
+    #     all_bad_rate:__bin_bad_rate得出的总体违约率
+    #     """
+    #     df2 = df.copy()
+    #     df2['expected'] = df2['total']*all_bad_rate # 计算每组的坏用户期望数量
+    #     combined = zip(df2['expected'],df2['bad']) # 遍历每组的坏用户期望数量和实际数量
+    #     chi = [(i[0]-i[1])**2/i[0] for i in combined] # 计算每组的卡方值
+    #     chi2 = sum(chi) # 计算总的卡方值
+    #     return chi2
+
+    def __cal_chi2(self, df, all_bad_rate):
+        """
+        df: __bin_bad_rate得出的regroup
+        all_bad_rate: __bin_bad_rate得出的总体违约率
+        """
+        df2 = df.copy()
+        df2['expected'] = df2['total'] * all_bad_rate  # 计算每组的坏用户期望数量
+
+        # Add a small constant to avoid division by zero
+        epsilon = 1e-10
+        df2['expected'] = df2['expected'].apply(lambda x: x + epsilon if x == 0 else x)
+
+        combined = zip(df2['expected'], df2['bad'])  # 遍历每组的坏用户期望数量和实际数量
+        chi = [(i[0] - i[1]) ** 2 / i[0] for i in combined]  # 计算每组的卡方值
+        chi2 = sum(chi)  # 计算总的卡方值
+        return chi2
 
     def __assign_bin(self, x, cutoffpoints):
         """
@@ -157,12 +171,7 @@ class BinningModule:
                 if cutoffpoints[i] < x <= cutoffpoints[i + 1]:  # 如果x在两个cutoff点之间，则x映射为Bin(i+1)
                     return 'Bin {}'.format(i + 1)
 
-    def __chi_merge(self, df, col, target, **kwargs):
-        max_bin = kwargs.get('max_bin', None)
-        min_binpct = kwargs.get('min_binpct', None)
-
-        df = self.yihui_instance.data.copy()
-
+    def __ChiMerge(self, df, col, target, max_bin=5, min_binpct=0):
         col_unique = sorted(list(set(df[col])))  # 变量的唯一值并排序
         n = len(col_unique)  # 变量唯一值得个数
         df2 = df.copy()
@@ -172,7 +181,7 @@ class BinningModule:
         else:
             df2['col_map'] = df2[col]  # 变量的唯一值数目没有超过100，则不用做映射
         # 生成dict_bad,regroup,all_bad_rate的元组
-        (dict_bad, regroup, all_bad_rate) = self.__bin_bad_rate(df2, 'col_map', target, grant_rate_indicator=1)
+        (dict_bad, regroup, all_bad_rate) = self.__bin_bad_rate(df2, 'col_map', target, grantRateIndicator=1)
         col_map_unique = sorted(list(set(df2['col_map'])))  # 对变量映射后的value进行去重排序
         group_interval = [[i] for i in col_map_unique]  # 对col_map_unique中每个值创建list并存储在group_interval中
 
@@ -283,16 +292,15 @@ class BinningModule:
         ninf = float('-inf')
         bin_df = []
         iv_value = []
-        ks_value = []
 
         for col in col_list:
             if method == 'freq':  # 等频分箱
                 bucket = pd.qcut(df[col], n, duplicates='drop')
             elif method == 'count':  # 等距分箱
                 bucket = pd.cut(df[col], n)
-            # elif method == 'cart':  # 决策树cart
+            # elif method == 'cart':  #决策树cart
             #     cut = sc.binning_function.get_cart_bincut(df, col, target, leaf_stop_percent=leaf_stop_percent)
-            #     bucket = pd.cut(df[col], cut)
+            #     bucket = pd.cut(df[col],cut)
             elif method == 'monotonic':
                 r = 0
                 while np.abs(r) < 1:
@@ -305,7 +313,7 @@ class BinningModule:
                 bucket = pd.qcut(df[col], n - 1)
                 print(bucket)
             elif method == 'ChiMerge':  # 卡方
-                cut = self.__chi_merge(df, col, target, max_bin=max_bin, min_binpct=min_binpct)
+                cut = self.__ChiMerge(df, col, target, max_bin=max_bin, min_binpct=min_binpct)
                 cut.insert(0, ninf)
                 cut.append(inf)
                 bucket = pd.cut(df[col], cut)
@@ -336,12 +344,221 @@ class BinningModule:
             d2['bin_iv'] = (d2['badattr'] - d2['goodattr']) * d2['woe']
             d2['IV'] = d2['bin_iv'].sum()
             iv = d2['bin_iv'].sum().round(3)
-            ks = d2['ks'].max()
-            print('var:{}'.format(col))
+            print('变量名:{}'.format(col))
             print('IV:{}'.format(iv))
-            print('KS:{}'.format(ks))
+            print('\t')
             bin_df.append(d2)
             iv_value.append(iv)
-            ks_value.append(ks)
+            d2.reset_index(inplace=True)
+            self.bin_df = bin_df
+            self.iv_value = iv_value
 
-        return bin_df, iv_value, ks_value
+        return bin_df, iv_value
+
+    # 数值型变量的分箱（手动分箱）
+    def binning_num_manual(self, df, target, col, cut):
+        """
+        df:数据集
+        target:目标变量的字段名
+        col:变量名
+        cut:断点list
+    
+        return:
+        bin_df :list形式，里面存储变量的分箱结果
+        iv_value:list形式，里面存储每个变量的IV值
+        """
+        total = df[target].count()
+        bad = df[target].sum()
+        good = total - bad
+        all_odds = good / bad
+        inf = float('inf')
+        ninf = float('-inf')
+        bin_df = []
+        iv_value = []
+
+        col = col
+        cut = cut
+        cut.insert(0, ninf)
+        cut.append(inf)
+        bucket = pd.cut(df[col], cut)
+        d1 = df.groupby(bucket)
+        d2 = pd.DataFrame()
+        d2['min_bin'] = d1[col].min()
+        d2['max_bin'] = d1[col].max()
+        d2['total'] = d1[target].count()
+        d2['totalrate'] = d2['total'] / total
+        d2['bad'] = d1[target].sum()
+        d2['badrate'] = d2['bad'] / d2['total']
+        d2['good'] = d2['total'] - d2['bad']
+        d2['goodrate'] = d2['good'] / d2['total']
+        d2['badattr'] = d2['bad'] / bad
+        d2['goodattr'] = (d2['total'] - d2['bad']) / good
+        d2['cumgoodrate'] = (d2['goodrate'] * d2['totalrate'] / (good / total)).cumsum()
+        d2['cumbadrate'] = (d2['badrate'] * d2['totalrate'] / (bad / total)).cumsum()
+        d2['odds'] = d2['good'] / d2['bad']
+        GB_list = []
+        for i in d2.odds:
+            if i >= all_odds:
+                GB_index = str(round((i / all_odds) * 100, 0)) + str('G')
+            else:
+                GB_index = str(round((all_odds / i) * 100, 0)) + str('B')
+            GB_list.append(GB_index)
+        d2['GB_index'] = GB_list
+        d2['woe'] = np.log(d2['badattr'] / d2['goodattr'])
+        d2['bin_iv'] = (d2['badattr'] - d2['goodattr']) * d2['woe']
+        d2['IV'] = d2['bin_iv'].sum()
+        iv = d2['bin_iv'].sum().round(3)
+        print('变量名:{}'.format(col))
+        print('IV:{}'.format(iv))
+        print('\t')
+        bin_df.append(d2)
+        iv_value.append(iv)
+        d2.reset_index(inplace=True)
+
+        return bin_df, iv_value
+
+
+
+    # 自定义分箱
+    def binning_self(self, col, cut=None, right_border=True):
+        """
+        df: 数据集
+        col:分箱的单个变量名
+        cut:划分区间的list
+        right_border：设定左开右闭、左闭右开
+    
+        return:
+        bin_df: df形式，单个变量的分箱结果
+        iv_value: 单个变量的iv
+        """
+        df = self.yihui_instance.data.copy()
+        target = self.yihui_instance.target
+
+        total = df[target].count()
+        bad = df[target].sum()
+        good = total - bad
+        all_odds = good / bad
+        bucket = pd.cut(df[col], cut, right=right_border)
+        d1 = df.groupby(bucket)
+        d2 = pd.DataFrame()
+        d2['min_bin'] = d1[col].min()
+        d2['max_bin'] = d1[col].max()
+        d2['total'] = d1[target].count()
+        d2['totalrate'] = d2['total'] / total
+        d2['bad'] = d1[target].sum()
+        d2['badrate'] = d2['bad'] / d2['total']
+        d2['good'] = d2['total'] - d2['bad']
+        d2['goodrate'] = d2['good'] / d2['total']
+        d2['badattr'] = d2['bad'] / bad
+        d2['goodattr'] = (d2['total'] - d2['bad']) / good
+        d2['odds'] = d2['good'] / d2['bad']
+        GB_list = []
+        for i in d2.odds:
+            if i >= all_odds:
+                GB_index = str(round((i / all_odds) * 100, 0)) + str('G')
+            else:
+                GB_index = str(round((all_odds / i) * 100, 0)) + str('B')
+            GB_list.append(GB_index)
+        d2['GB_index'] = GB_list
+        d2['woe'] = np.log(d2['badattr'] / d2['goodattr'])
+        d2['bin_iv'] = (d2['badattr'] - d2['goodattr']) * d2['woe']
+        d2['IV'] = d2['bin_iv'].sum()
+        iv_value = d2['bin_iv'].sum().round(3)
+        print('变量名:{}'.format(col))
+        print('IV:{}'.format(iv_value))
+        bin_df = d2.copy()
+        return bin_df, iv_value
+
+    # 变量分箱结果的检查
+
+    # woe的可视化
+    def plot_woe(self, hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None, y=None):
+        """
+        bin_df:list形式，里面存储每个变量的分箱结果
+        hspace :子图之间的间隔(y轴方向)
+        wspace :子图之间的间隔(x轴方向)
+        plt_size :图纸的尺寸
+        plt_num :子图的数量
+        x :子图矩阵中一行子图的数量
+        y :子图矩阵中一列子图的数量
+    
+        return :每个变量的woe变化趋势图
+        """
+        bin_df = self.bin_df.copy()
+        plt.figure(figsize=plt_size)
+        plt.subplots_adjust(hspace=hspace, wspace=wspace)
+        for i, df in zip(range(1, plt_num + 1, 1), bin_df):
+            col_name = df.columns.values[0]
+            df = df.reset_index()
+            plt.subplot(x, y, i)
+            plt.title(col_name, color='cornflowerblue')
+            sns.barplot(data=df, x=col_name, y='woe')
+            plt.xlabel('')
+            plt.xticks(ticks=[])  # rotation=30 #ticks = [] 去掉x轴坐标
+        return plt.show()
+
+    # 检验woe是否单调
+    def woe_monoton(self):
+        """
+        bin_df:list形式，里面存储每个变量的分箱结果
+    
+        return :
+        woe_notmonoton_col :woe没有呈单调变化的变量，list形式
+        woe_judge_df :df形式，每个变量的检验结果
+        """
+        bin_df = self.bin_df.copy()
+        woe_notmonoton_col = []
+        col_list = []
+        woe_judge = []
+        for woe_df in bin_df:
+            col_name = woe_df.index.name
+            woe_list = list(woe_df.woe)
+            if woe_df.shape[0] == 2:
+                # print('{}是否单调: True'.format(col_name))
+                col_list.append(col_name)
+                woe_judge.append('True')
+            else:
+                woe_not_monoton = [(woe_list[i] < woe_list[i + 1] and woe_list[i] < woe_list[i - 1]) or (
+                            woe_list[i] > woe_list[i + 1] and woe_list[i] > woe_list[i - 1]) for i in
+                                   range(1, len(woe_list) - 1, 1)]
+                if True in woe_not_monoton:
+                    # print('{}是否单调: False'.format(col_name))
+                    woe_notmonoton_col.append(col_name)
+                    col_list.append(col_name)
+                    woe_judge.append('False')
+                else:
+                    # print('{}是否单调: True'.format(col_name))
+                    col_list.append(col_name)
+                    woe_judge.append('True')
+        woe_judge_df = pd.DataFrame({'col': col_list,
+                                     'judge_monoton': woe_judge})
+        return woe_notmonoton_col, woe_judge_df
+
+    # 检查某个区间的woe是否大于1
+    def woe_large(self):
+        """
+        bin_df:list形式，里面存储每个变量的分箱结果
+    
+        return:
+        woe_large_col: 某个区间woe大于1的变量，list集合
+        woe_judge_df :df形式，每个变量的检验结果
+        """
+        bin_df = self.bin_df.copy()
+
+        woe_large_col = []
+        col_list = []
+        woe_judge = []
+        for woe_df in bin_df:
+            col_name = woe_df.index.name
+            woe_list = list(woe_df.woe)
+            woe_large = list(filter(lambda x: x >= 1, woe_list))
+            if len(woe_large) > 0:
+                col_list.append(col_name)
+                woe_judge.append('True')
+                woe_large_col.append(col_name)
+            else:
+                col_list.append(col_name)
+                woe_judge.append('False')
+        woe_judge_df = pd.DataFrame({'col': col_list,
+                                     'judge_large': woe_judge})
+        return woe_large_col, woe_judge_df
