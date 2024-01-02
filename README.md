@@ -1,18 +1,16 @@
-#########################################################################
+# Yihui 一会
 
-###### Based on https://github.com/taenggu0309/Scorecard--Function ######
+只需要一会 轻松解决逻辑回归建模
 
-###### Revised and enriched by JustinGao                           ######
+Forked https://github.com/taenggu0309/Scorecard--Function 
 
-#########################################################################
+Encyc 修改补充重构
+
 
 
 ## 评分卡模型实现函数模块
 
-
-author: JustinGao
-</br>modify_date: 2022-09-22
-
+ 
 
 ## 函数目录：
 
