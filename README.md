@@ -138,4 +138,3 @@ Encyc 修改补充重构
 ### 11.datamerchant_tools.py
 
 * weight_ks -- 计算加权之后的模型KS以及区间坏率
-* 
