@@ -41,7 +41,7 @@ def iv_count(data, var, target, weight):
     return iv
 
 
-# In[ ]:
+
 # 02 基于CART算法的最优分箱代码实现
 
 
@@ -177,8 +177,6 @@ def get_cart_bincut(data, var, target, leaf_stop_percent=0.05):
     return best_bincut
 
 
-# In[]:
-
 # 03 基于卡方检验的最优分箱代码实现
 
 
@@ -281,7 +279,7 @@ def get_chimerge_bincut(data, var, target, max_group=None, chi_threshold=None):
     return best_bincut
 
 
-# In[ ]:
+
 # 04 基于最优KS的最优分箱代码实现
 
 def get_maxks_split_point(data, var, target, min_sample=0.05):
@@ -369,7 +367,7 @@ def get_bestks_bincut(data, var, target, leaf_stop_percent=0.05):
     return best_bincut
 
 
-# In[ ]:
+
 
 
 # 等频分箱
@@ -526,7 +524,7 @@ def bin_self(x, y, cut):  ##cut:自定义分箱（list）
     return d3
 
 
-# In[ ]:
+
 # Examples:
 
 # 先卡方分箱
@@ -537,10 +535,10 @@ def bin_self(x, y, cut):  ##cut:自定义分箱（list）
 # a = get_bestks_bincut(df, '决策分数', 'target')
 # bins_bestks = bin_self(df['决策分数'], df['target'], a)
 
-# In[ ]:
 
 
-# In[ ]:
+
+
 # 测试
 '''
 df['score_bins1'] = pd.cut(df['决策分数'], bins=get_cart_bincut(df, '决策分数', 'target'))
@@ -570,3 +568,4 @@ print("income_cart_bins:", iv_count(df, 'income_bins1', 'target'))
 print("income_chimerge_bins:", iv_count(df, 'income_bins2', 'target'))
 print("income_bestks_bins:", iv_count(df, 'income_bins3', 'target'))
 '''
+
