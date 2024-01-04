@@ -30,6 +30,10 @@ if __name__ == "__main__":
     categorical_vars_list = yihui_project.get_categorical_variables()
     numeric_vars_list = yihui_project.get_numeric_variables()
 
+    eda_result = yihui_project.eda_module.auto_eda_simple()
+    print(eda_result)
+
+
     # ### eda 阶段
     #
     # # 使用ydata_profiling 自动生成eda报告

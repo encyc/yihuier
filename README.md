@@ -28,6 +28,7 @@ Encyc 修改补充重构
 
 3. 自动EDA
 * 使用ydata_profiling自动分析数据集
+* 快速自动分析数据集（无图）
 
 ### 2. dataprocessing.py
 
