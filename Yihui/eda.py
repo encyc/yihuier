@@ -3,19 +3,17 @@ import pandas as pd
 import seaborn as sns
 from ydata_profiling import ProfileReport
 
+import pandas as pd
+import numpy as np
+from scipy.stats import entropy
 
 class EDAModule:
     def __init__(self, yihui_instance):
         self.yihui_instance = yihui_instance
-
-    def auto_eda_profiling(self):
-        # 使用pandas profiling进行自动EDA
-        profile = ProfileReport(self.yihui_instance.yihui_instance.data,
-                                title="Report",
-                                correlations={"auto": {"calculate": False}},
-                                missing_diagrams={"Heatmap": False}
-                                )  # object created
-        profile.to_file(output_file='../Data/output.html')
+        self.data = self.yihui_instance.data.copy()
+        self.variables = self.yihui_instance.data.columns
+        self.category_variables = self.yihui_instance.get_categorical_variables()
+        self.numeric_variables = self.yihui_instance.get_numeric_variables()
 
     # 类别型变量的分布
     def plot_cate_var(self, col_list, hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None, y=None):
@@ -155,3 +153,63 @@ class EDAModule:
             plt.xticks(rotation=60)
             plt.xlabel('')
         return plt.show()
+
+    # 使用ydata_profiling进行自动EDA，维度较高时，速度较慢
+    def auto_eda_profiling(self):
+        # 使用pandas profiling进行自动EDA
+        profile = ProfileReport(self.yihui_instance.yihui_instance.data,
+                                title="Report",
+                                correlations={"auto": {"calculate": False}},
+                                missing_diagrams={"Heatmap": False}
+                                )  # object created
+        profile.to_file(output_file='../Data/output.html')
+
+
+
+    def __calculate_category_stats(self):
+        category_stats = {}
+        for var in self.category_variables:
+            unique_count = self.data[var].nunique()
+            entropy_val = entropy(self.data[var].value_counts(normalize=True))
+            missing_pct = self.data[var].isnull().mean() * 100
+
+            category_stats[var] = {
+                'unique_count': unique_count,
+                'entropy': entropy_val,
+                'missing_pct': missing_pct
+            }
+
+        return pd.DataFrame(category_stats).transpose()
+
+    def __calculate_numeric_stats(self):
+        numeric_stats = {}
+        for var in self.numeric_variables:
+            mean_val = self.data[var].mean()
+            min_val = self.data[var].min()
+            q1 = self.data[var].quantile(0.25)
+            median_val = self.data[var].median()
+            q3 = self.data[var].quantile(0.75)
+            max_val = self.data[var].max()
+            missing_pct = self.data[var].isnull().mean() * 100
+
+            numeric_stats[var] = {
+                'mean': mean_val,
+                'min': min_val,
+                'q1': q1,
+                'median': median_val,
+                'q3': q3,
+                'max': max_val,
+                'missing_pct': missing_pct
+            }
+
+        return pd.DataFrame(numeric_stats).transpose()
+
+    # 快速自动分析数据集（无图）
+    def auto_eda_simple(self):
+        category_stats = self.__calculate_category_stats()
+        numeric_stats = self.__calculate_numeric_stats()
+
+        # Combine the results into a single DataFrame
+        eda_results = pd.concat([category_stats, numeric_stats])
+
+        return eda_results
