@@ -108,13 +108,13 @@ if __name__ == "__main__":
     # print(rf_select_col)
 
     # yihui_project.var_select_module.plot_corr(yihui_project.get_numeric_variables(),0.5,'gt')
-
+    #
     # corr_map_df = yihui_project.var_select_module.corr_mapping(yihui_project.get_numeric_variables(), threshold=0.5)
     # print(corr_map_df)
-
+    #
     # list_corr = yihui_project.var_select_module.forward_delete_corr(yihui_project.get_numeric_variables(),0.5)
     # print(list_corr)
     # yihui_project.var_select_module.plot_corr(list_corr)
 
-    twice = yihui_project.var_select_module.forward_delete_corr_ivfirst(['v1','v2','v3','v4'],0.5)
+    twice = yihui_project.var_select_module.forward_delete_corr_ivfirst(['v1','v2','v3','v4'],threshold=0.5)
     print(twice)

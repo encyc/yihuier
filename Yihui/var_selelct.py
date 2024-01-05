@@ -175,7 +175,7 @@ class VarSelectModule:
         twice = self.__up_triangle(df, once, iv_rank=iv_rank, threshold=threshold)
         return twice
 
-    def __up_triangle(self, df, col_list, iv_rank, fea_imp, threshold=0.5):
+    def __up_triangle(self, df, col_list, iv_rank, threshold=0.5):
         '''
         like above
         '''
@@ -189,18 +189,18 @@ class VarSelectModule:
                 corr = corr_df.loc[row, col]
                 if iv_rank is not None:
                     # 记录横纵变量的iv
-                    coll = (iv_rank[iv_rank['col'] == col]['iv']).values
-                    roww = (iv_rank[iv_rank['col'] == row]['iv']).values
-                if fea_imp is not None:
-                    # 记录横纵变量的iv
-                    coll = (fea_imp[fea_imp['col'] == col]['imp']).values
-                    roww = (fea_imp[fea_imp['col'] == row]['imp']).values
+                    iv_col = (iv_rank[iv_rank['col'] == col]['iv']).values
+                    iv_row = (iv_rank[iv_rank['col'] == row]['iv']).values
+                # elif fea_imp is not None:
+                #     # 记录横纵变量的iv
+                #     coll = (fea_imp[fea_imp['col'] == col]['imp']).values
+                #     roww = (fea_imp[fea_imp['col'] == row]['imp']).values
                 # 判断
                 if corr > threshold and col != row:
-                    if coll > roww:
+                    if iv_col > iv_row:
                         list_corr.remove(row)
                         # print('delete %s %s > %s' %(row,iv_col,iv_row))
-                    elif coll <= roww:
+                    elif iv_col <= iv_row:
                         list_corr.remove(row)
                         # print('delete %s %s > %s' %(row,iv_col,iv_row))
                         break  # 如果删除了row，则没办法继续for循环，所以要break
