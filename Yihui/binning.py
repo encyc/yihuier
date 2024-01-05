@@ -12,8 +12,8 @@ class BinningModule:
         self.yihui_instance = yihui_instance
         self.bin_df = None
         self.woe_list = None
-        self.iv_value = None
-        self.ks_value = None
+        self.iv_df = None
+        self.ks_df = None
 
     def binning_cate(self, col_list):
         df = self.yihui_instance.data
@@ -68,8 +68,6 @@ class BinningModule:
             iv_value.append(iv)
             ks_value.append(ks)
         self.bin_df = bin_df
-        self.iv_value = iv_value
-        self.ks_value = ks_value
         return bin_df, iv_value, ks_value
 
     # 数值型变量的分箱
@@ -171,7 +169,7 @@ class BinningModule:
                 if cutoffpoints[i] < x <= cutoffpoints[i + 1]:  # 如果x在两个cutoff点之间，则x映射为Bin(i+1)
                     return 'Bin {}'.format(i + 1)
 
-    def __ChiMerge(self, df, col, target, max_bin=5, min_binpct=0):
+    def __chi_merge(self, df, col, target, max_bin=5, min_binpct=0):
         col_unique = sorted(list(set(df[col])))  # 变量的唯一值并排序
         n = len(col_unique)  # 变量唯一值得个数
         df2 = df.copy()
@@ -267,7 +265,7 @@ class BinningModule:
         return cutoffpoints
 
     # 数值型变量的分箱
-    def binning_num(self, col_list, n=10, max_bin=None, min_binpct=None, method=None, leaf_stop_percent=0.05):
+    def binning_num(self, col_list, max_bin=None, min_binpct=None, method='ChiMerge', n=10, leaf_stop_percent=0.05):
         """
         df:数据集
         target:目标变量的字段名
@@ -313,7 +311,7 @@ class BinningModule:
                 bucket = pd.qcut(df[col], n - 1)
                 print(bucket)
             elif method == 'ChiMerge':  # 卡方
-                cut = self.__ChiMerge(df, col, target, max_bin=max_bin, min_binpct=min_binpct)
+                cut = self.__chi_merge(df, col, target, max_bin=max_bin, min_binpct=min_binpct)
                 cut.insert(0, ninf)
                 cut.append(inf)
                 bucket = pd.cut(df[col], cut)
@@ -350,10 +348,33 @@ class BinningModule:
             bin_df.append(d2)
             iv_value.append(iv)
             d2.reset_index(inplace=True)
-            self.bin_df = bin_df
-            self.iv_value = iv_value
-
         return bin_df, iv_value
+
+    # 数值型变量的iv明细表
+    def iv_num(self, col_list, **kwargs):
+        """
+        df:数据集
+        target:目标变量的字段名
+        col_list:变量list集合
+        max_bin:最大的分箱个数
+        min_binpct:区间内样本所占总体的最小比
+
+        return :变量的iv明细表
+        """
+        max_bin = kwargs.get('max_bin', None)
+        min_binpct = kwargs.get('min_binpct', None)
+        method = kwargs.get('method', None)
+
+        df = self.yihui_instance.data.copy()
+        target = self.yihui_instance.target
+
+        bin_df, iv_value = self.binning_num(col_list, max_bin=max_bin, min_binpct=min_binpct, method='ChiMerge')
+        iv_df = pd.DataFrame({'col': col_list,
+                              'iv': iv_value})
+        iv_df = iv_df.sort_values('iv', ascending=False)
+        self.iv_df = iv_df
+        return iv_df
+
 
     # 数值型变量的分箱（手动分箱）
     def binning_num_manual(self, df, target, col, cut):
