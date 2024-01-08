@@ -40,9 +40,12 @@ class VarSelectModule:
         xgmodel = xgmodel.fit(x, y, eval_metric='auc')
         xg_fea_imp = pd.DataFrame({'col': list(x.columns),
                                    'imp': xgmodel.feature_importances_})
-        xg_fea_imp = xg_fea_imp.sort_values('imp', ascending=False).reset_index(drop=True).iloc[:imp_num, :]
+        xg_fea_imp_rank = xg_fea_imp.sort_values('imp', ascending=False).reset_index(drop=True).iloc[:imp_num, :]
         xg_select_col = list(xg_fea_imp.col)
-        return xg_fea_imp, xg_select_col
+
+        self.xg_fea_imp = xg_fea_imp
+
+        return xg_fea_imp, xg_fea_imp_rank, xg_select_col
 
     # 随机森林筛选变量
     def select_rf(self, col_list, imp_num=None):
@@ -66,6 +69,9 @@ class VarSelectModule:
                                    'imp': rfmodel.feature_importances_})
         rf_fea_imp = rf_fea_imp.sort_values('imp', ascending=False).reset_index(drop=True).iloc[:imp_num, :]
         rf_select_col = list(rf_fea_imp.col)
+
+        self.rf_fea_imp = rf_fea_imp
+
         return rf_fea_imp, rf_select_col
 
     # 相关性可视化
@@ -162,52 +168,58 @@ class VarSelectModule:
         return: 考虑了IV的大小之后，筛选出来的变量list
         '''
 
+        global iv_rank
+
+        def up_triangle(df, col_list, iv_rank, threshold=0.5):
+            '''
+            like above
+            '''
+            # initial
+            list_corr = col_list[:]
+            # 计算变量之间的corr并存表
+            corr_df = df.loc[:, col_list].corr()
+            # 遍历corr_df的所有corr
+            for col in list_corr:
+                for row in list_corr:
+                    corr = corr_df.loc[row, col]
+                    if iv_rank is not None:
+                        # 记录横纵变量的iv
+                        iv_col = (iv_rank[iv_rank['col'] == col]['iv']).values
+                        iv_row = (iv_rank[iv_rank['col'] == row]['iv']).values
+                    # elif fea_imp is not None:
+                    #     # 记录横纵变量的iv
+                    #     coll = (fea_imp[fea_imp['col'] == col]['imp']).values
+                    #     roww = (fea_imp[fea_imp['col'] == row]['imp']).values
+                    # 判断
+                    if corr > threshold and col != row:
+                        if iv_col > iv_row:
+                            list_corr.remove(row)
+                            # print('delete %s %s > %s' %(row,iv_col,iv_row))
+                        elif iv_col <= iv_row:
+                            list_corr.remove(row)
+                            # print('delete %s %s > %s' %(row,iv_col,iv_row))
+                            break  # 如果删除了row，则没办法继续for循环，所以要break
+            return list_corr
+
         df = self.yihui_instance.data.copy()
 
         if self.yihui_instance.binning_module.iv_df is not None:
+            print(self.yihui_instance.binning_module.iv_df)
             iv_rank = self.yihui_instance.binning_module.iv_df.sort_values(by='iv',ascending=False)
         elif self.yihui_instance.binning_module.iv_df is None:
             _, iv_rank = self.yihui_instance.binning_module.iv_num(
-                col_list, max_bin=20, min_binpct=0, method='ChiMerge').sort_values(by='iv',ascending=False)
+                col_list, max_bin=20, min_binpct=0, method='ChiMerge')
 
+        # iv_rank = iv_rank.sort_values(by='iv',ascending=False)
 
-        once = self.__up_triangle(df, col_list, iv_rank=iv_rank, threshold=threshold)
-        twice = self.__up_triangle(df, once, iv_rank=iv_rank, threshold=threshold)
+        once = up_triangle(df, col_list, iv_rank=iv_rank, threshold=threshold)
+        twice = up_triangle(df, once, iv_rank=iv_rank, threshold=threshold)
         return twice
 
-    def __up_triangle(self, df, col_list, iv_rank, threshold=0.5):
-        '''
-        like above
-        '''
-        # initial
-        list_corr = col_list[:]
-        # 计算变量之间的corr并存表
-        corr_df = df.loc[:, col_list].corr()
-        # 遍历corr_df的所有corr
-        for col in list_corr:
-            for row in list_corr:
-                corr = corr_df.loc[row, col]
-                if iv_rank is not None:
-                    # 记录横纵变量的iv
-                    iv_col = (iv_rank[iv_rank['col'] == col]['iv']).values
-                    iv_row = (iv_rank[iv_rank['col'] == row]['iv']).values
-                # elif fea_imp is not None:
-                #     # 记录横纵变量的iv
-                #     coll = (fea_imp[fea_imp['col'] == col]['imp']).values
-                #     roww = (fea_imp[fea_imp['col'] == row]['imp']).values
-                # 判断
-                if corr > threshold and col != row:
-                    if iv_col > iv_row:
-                        list_corr.remove(row)
-                        # print('delete %s %s > %s' %(row,iv_col,iv_row))
-                    elif iv_col <= iv_row:
-                        list_corr.remove(row)
-                        # print('delete %s %s > %s' %(row,iv_col,iv_row))
-                        break  # 如果删除了row，则没办法继续for循环，所以要break
-        return list_corr
+
 
     # 相关性剔除（考虑xgboost_imp or rf_imp）
-    def forward_delete_corr_impfirst(df, col_list, fea_imp, threshold=0.5):
+    def forward_delete_corr_impfirst(self, col_list, type, threshold=0.5):
         '''
         df: 数据集
         col_list: 变量list
@@ -244,6 +256,15 @@ class VarSelectModule:
                             # print('delete %s %s > %s' %(row,iv_col,iv_row))
                             break  # 如果删除了row，则没办法继续for循环，所以要break
             return list_corr
+
+        df = self.yihui_instance.data.copy()
+
+        if type == 'xgboost':
+            if self.xg_fea_imp is not None:
+                fea_imp = self.xg_fea_imp.sort_values(by='imp',ascending=False)
+            elif self.xg_fea_imp is None:
+               fea_imp,_,_ = self.select_xgboost(col_list)
+               fea_imp = fea_imp.sort_values(by='imp',ascending=False)
 
         once = up_triangle(df, col_list, fea_imp, threshold)
         twice = up_triangle(df, once, fea_imp, threshold)

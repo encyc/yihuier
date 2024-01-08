@@ -371,7 +371,6 @@ class BinningModule:
         bin_df, iv_value = self.binning_num(col_list, max_bin=max_bin, min_binpct=min_binpct, method='ChiMerge')
         iv_df = pd.DataFrame({'col': col_list,
                               'iv': iv_value})
-        iv_df = iv_df.sort_values('iv', ascending=False)
         self.iv_df = iv_df
         return iv_df
 
