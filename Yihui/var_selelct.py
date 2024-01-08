@@ -127,9 +127,9 @@ class VarSelectModule:
         corr_map_df = pd.DataFrame({'col_A': col_a,
                                     'col_B': col_b,
                                     'corr': corr_value})
+    # 相关性剔除
         return corr_map_df
 
-    # 相关性剔除
     def forward_delete_corr(self, col_list, threshold=None):
         """
         df:数据集
