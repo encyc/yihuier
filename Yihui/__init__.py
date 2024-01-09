@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
     print("Categorical Variables:", yihui_project.get_categorical_variables())
     print("Numeric Variables:", yihui_project.get_numeric_variables())
+    print("Date Variables:", yihui_project.get_date_variables())
 
     # 直接访问 Yihui 类的属性获取字符型和数值型变量的名字
     categorical_vars_list = yihui_project.get_categorical_variables()
