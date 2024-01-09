@@ -205,3 +205,26 @@ class DataProcessingModule:
             return data_without_missing_target
         else:
             print('未指定目标变量，无法执行删除操作。')
+
+    # 日期变量转换为二进制变量
+    def date_var_shift_binary(self, col_list, replace=False):
+        """
+        将指定的日期型变量转换成二进制变量
+
+        Parameters:
+        - date_variable: str, 指定的日期型变量名称
+
+        Returns:
+        - data_with_binary: pd.DataFrame, 包含二进制变量的数据集
+        """
+
+        data = self.yihui_instance.data.copy()
+        # 创建一个二进制变量，表示日期是否存在
+        for col in col_list:
+            data[col + '_binary'] = 0
+            data.loc[~data[col].isnull(), col + '_binary'] = 1
+            if not replace:
+                # 如果需要保留原始日期变量，可以选择删除原始日期列
+                data.drop(columns=[col], inplace=True)
+
+        return data

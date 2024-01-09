@@ -38,7 +38,7 @@ Encyc 修改补充重构
 * missing_delete_obs -- 缺失值剔除（针对单个样本）
 * fillna_cate_var   -- 缺失值填充（类别型变量）
 * fillna_num_var    -- 缺失值填充（数值型变量）
-
+* date_var_shift_binary -- 日期变量转换为二进制变量（日期型变量）
 
 2. 常变量/同值化处理
 
