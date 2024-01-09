@@ -1,6 +1,6 @@
-# Yihui 一会
+# Yihuier 一会儿
 
-只需要一会 轻松解决逻辑回归建模
+只需要一会儿 轻松解决逻辑回归建模
 
 Forked https://github.com/taenggu0309/Scorecard--Function 
 
