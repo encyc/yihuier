@@ -18,8 +18,8 @@ from sklearn.mixture import GaussianMixture  # 高斯模糊
 from tqdm import tqdm
 
 class ClusterMuodule():
-    def __init__(self, yihui_instance):
-        self.yihui_instance = yihui_instance
+    def __init__(self, yihuier_instance):
+        self.yihuier_instance = yihuier_instance
 
     # 亲和力传播
     # cluster_AffinityPropagation(df,['v1','v2'],damping = 0.9)
@@ -31,7 +31,7 @@ class ClusterMuodule():
         要调整的主要配置是将“ 阻尼 ”设置为0.5到1，甚至可能是“首选项”。
         """
         # 定义模型
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         model = AffinityPropagation(damping=damping)
         # 匹配模型
@@ -59,7 +59,7 @@ class ClusterMuodule():
         主要配置是“ n _ clusters ”集，这是对数据中的群集数量的估计。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         model1 = AgglomerativeClustering(n_clusters=n_clusters)
@@ -86,7 +86,7 @@ class ClusterMuodule():
         BIRCH 递增地和动态地群集传入的多维度量数据点，以尝试利用可用资源（即可用内存和时间约束）产生最佳质量的聚类。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         model = Birch(threshold=threshold, n_clusters=n_clusters)
         # 适配模型
@@ -115,7 +115,7 @@ class ClusterMuodule():
         DBSCAN 只需要一个输入参数，并支持用户为其确定适当的值
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         model = DBSCAN(eps=eps, min_samples=min_samples)
@@ -142,7 +142,7 @@ class ClusterMuodule():
         这个叫做“ K-均值”的过程似乎给出了在类内方差意义上相当有效的分区。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         model = KMeans(n_clusters=n_clusters)
@@ -172,7 +172,7 @@ class ClusterMuodule():
         与经典批处理算法相比，这降低了计算成本的数量级，同时提供了比在线随机梯度下降更好的解决方案。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         model = MiniBatchKMeans(n_clusters=n_clusters)
@@ -200,7 +200,7 @@ class ClusterMuodule():
         对离散数据证明了递推平均移位程序收敛到最接近驻点的基础密度函数，从而证明了它在检测密度模式中的应用。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         model = MeanShift()
@@ -230,7 +230,7 @@ class ClusterMuodule():
         此群集排序包含相当于密度聚类的信息，该信息对应于范围广泛的参数设置。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         model = OPTICS(eps=eps, min_samples=min_samples)
@@ -257,7 +257,7 @@ class ClusterMuodule():
         这里，使用从点之间的距离导出的矩阵的顶部特征向量。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         print('fitting model')
@@ -282,7 +282,7 @@ class ClusterMuodule():
         高斯混合模型总结了一个多变量概率密度函数，顾名思义就是混合了高斯概率分布。
         """
         # 定义数据集
-        df = self.yihui_instance.data
+        df = self.yihuier_instance.data
         X = np.array(df[col_list])
         # 定义模型
         print('fitting model')

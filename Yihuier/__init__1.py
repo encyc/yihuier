@@ -2,7 +2,7 @@
 import warnings
 import pandas as pd
 import numpy as np
-from Yihui.yihui import Yihui
+from Yihuier.yihuier import Yihuier
 
 # 在主程序中使用 Yihui 类
 if __name__ == "__main__":
@@ -18,14 +18,17 @@ if __name__ == "__main__":
         ['Unnamed: 0', 'APPLY_SERIAL_NO', 'apply_time', 'CUSTOMER_ID', 'CERT_ID', 'PHONE_NUMBER', 'CUSTOMER_NAME'],
         axis=1)
 
-    yi = Yihui(df, 'dlq')
+    yi = Yihuier(df, 'dlq')
 
     print("Categorical Variables:", yi.get_categorical_variables())
     print("Numeric Variables:", yi.get_numeric_variables())
     print("Date Variables:", yi.get_date_variables())
 
-    df = yi.dp_module.date_var_shift_binary(yi.get_date_variables(),replace=True)
-    print(df['UPPA007_binary'])
+    yi.data = yi.dp_module.date_var_shift_binary(yi.get_date_variables(),replace=True)
+
+    print(yi.get_numeric_variables())
+
+
 #
 #     print(yi.get_categorical_variables())
 #     # yi.dp_module.fillna_cate_var(yi.get_categorical_variables(),'class','unkonwn')
@@ -44,4 +47,12 @@ if __name__ == "__main__":
 #     yi.data = yi.dp_module.fillna_num_var(yi.get_numeric_variables(),fill_type='class',fill_class_num=-999)
 #     # yi.dp_module.plot_bar_missing_var()
 #
-#     yi.binning_module.binning_num(yi.get_numeric_variables(),20,0)
+    _, iv_value = yi.binning_module.binning_num(yi.get_numeric_variables(),20,0)
+    print("iv_value:{}".format(iv_value))
+
+    xg_fea_imp = yi.var_select_module.select_xgboost(yi.get_numeric_variables())
+    print("xg_fea_imp:{}".format(xg_fea_imp))
+
+    rf_fea_imp = yi.var_select_module.select_rf(yi.get_numeric_variables())
+    print("rf_fea_imp:{}".format(rf_fea_imp))
+

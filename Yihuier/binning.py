@@ -8,16 +8,16 @@ from scipy.stats import spearmanr
 
 class BinningModule:
 
-    def __init__(self, yihui_instance):
-        self.yihui_instance = yihui_instance
+    def __init__(self, yihuier_instance):
+        self.yihuier_instance = yihuier_instance
         self.bin_df = None
         self.woe_list = None
         self.iv_df = None
         self.ks_df = None
 
     def binning_cate(self, col_list):
-        df = self.yihui_instance.data
-        target = self.yihui_instance.target
+        df = self.yihuier_instance.data
+        target = self.yihuier_instance.target
 
         total = df[target].count()
         bad = df[target].sum()
@@ -279,8 +279,8 @@ class BinningModule:
         bin_df :list形式，里面存储每个变量的分箱结果
         iv_value:list形式，里面存储每个变量的IV值
         """
-        df = self.yihui_instance.data.copy()
-        target = self.yihui_instance.target
+        df = self.yihuier_instance.data.copy()
+        target = self.yihuier_instance.target
 
         total = df[target].count()
         bad = df[target].sum()
@@ -365,8 +365,8 @@ class BinningModule:
         min_binpct = kwargs.get('min_binpct', None)
         method = kwargs.get('method', None)
 
-        df = self.yihui_instance.data.copy()
-        target = self.yihui_instance.target
+        df = self.yihuier_instance.data.copy()
+        target = self.yihuier_instance.target
 
         bin_df, iv_value = self.binning_num(col_list, max_bin=max_bin, min_binpct=min_binpct, method='ChiMerge')
         iv_df = pd.DataFrame({'col': col_list,
@@ -451,8 +451,8 @@ class BinningModule:
         bin_df: df形式，单个变量的分箱结果
         iv_value: 单个变量的iv
         """
-        df = self.yihui_instance.data.copy()
-        target = self.yihui_instance.target
+        df = self.yihuier_instance.data.copy()
+        target = self.yihuier_instance.target
 
         total = df[target].count()
         bad = df[target].sum()
