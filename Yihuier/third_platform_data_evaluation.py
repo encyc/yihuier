@@ -10,13 +10,14 @@ if __name__ == "__main__":
     warnings.filterwarnings('ignore')
 
     # generate data.csv
-    with open("../Data/data_yinlian.csv", "r") as f:
+    # with open("../Data/data_yinlian.csv", "r") as f:
+    with open("Data/yunyinshang.csv", "r") as f:
         data = pd.read_csv(f)
 
     df = data.copy()
-    df = df.drop(
-        ['Unnamed: 0', 'APPLY_SERIAL_NO', 'apply_time', 'CUSTOMER_ID', 'CERT_ID', 'PHONE_NUMBER', 'CUSTOMER_NAME'],
-        axis=1)
+    # df = df.drop(
+    #     ['Unnamed: 0', 'APPLY_SERIAL_NO', 'apply_time', 'CUSTOMER_ID', 'CERT_ID', 'PHONE_NUMBER', 'CUSTOMER_NAME'],
+    #     axis=1)
 
     yi = Yihuier(df, 'dlq')
 
@@ -47,12 +48,25 @@ if __name__ == "__main__":
 #     yi.data = yi.dp_module.fillna_num_var(yi.get_numeric_variables(),fill_type='class',fill_class_num=-999)
 #     # yi.dp_module.plot_bar_missing_var()
 #
-    _, iv_value = yi.binning_module.binning_num(yi.get_numeric_variables(),20,0)
-    print("iv_value:{}".format(iv_value))
+    iv_list = []
+    col_list = []
+    for col in yi.get_numeric_variables():
+        try:
+            _, iv_value = yi.binning_module.binning_num([col], 10, 0, 'freq')
+            col_list.append(col)
+            iv_list.append(iv_value[0])
 
-    xg_fea_imp = yi.var_select_module.select_xgboost(yi.get_numeric_variables())
-    print("xg_fea_imp:{}".format(xg_fea_imp))
-
-    rf_fea_imp = yi.var_select_module.select_rf(yi.get_numeric_variables())
-    print("rf_fea_imp:{}".format(rf_fea_imp))
-
+            # 处理 iv_value 或其他逻辑
+        except Exception as e:
+            print(f"Error processing variable {col}: {str(e)}")
+            continue  # 如果出现异常，跳过当前变量，继续下一个变量
+    iv = pd.DataFrame({'col': col_list, 'iv': iv_list})
+    print("iv_value:{}".format(iv))
+    # iv.to_csv("/Data/iv_yunyinshang.csv", index=False)
+    iv.to_csv("Data/iv_yunyinshang.csv", index=False)
+    # xg_fea_imp = yi.var_select_module.select_xgboost(yi.get_numeric_variables())
+    # print("xg_fea_imp:{}".format(xg_fea_imp))
+    #
+    # rf_fea_imp = yi.var_select_module.select_rf(yi.get_numeric_variables())
+    # print("rf_fea_imp:{}".format(rf_fea_imp))
+    #
