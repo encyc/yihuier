@@ -162,7 +162,7 @@ class EDAModule:
                                 correlations={"auto": {"calculate": False}},
                                 missing_diagrams={"Heatmap": False}
                                 )  # object created
-        profile.to_file(output_file='../Data/output.html')
+        profile.to_file(output_file='Data/output.html')
 
 
 

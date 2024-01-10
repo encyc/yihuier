@@ -154,13 +154,28 @@ class BinningModule:
         chi2 = sum(chi)  # 计算总的卡方值
         return chi2
 
+    # def __assign_bin(self, x, cutoffpoints):
+    #     """
+    #     x:变量的value
+    #     cutoffpoints:分箱的切割点
+    #     """
+    #     bin_num = len(cutoffpoints) + 1  # 箱体个数
+    #     if x <= cutoffpoints[0]:  # 如果x小于最小的cutoff点，则映射为Bin 0
+    #         return 'Bin 0'
+    #     elif x > cutoffpoints[-1]:  # 如果x大于最大的cutoff点，则映射为Bin(bin_num-1)
+    #         return 'Bin {}'.format(bin_num - 1)
+    #     else:
+    #         for i in range(0, bin_num - 1):
+    #             if cutoffpoints[i] < x <= cutoffpoints[i + 1]:  # 如果x在两个cutoff点之间，则x映射为Bin(i+1)
+    #                 return 'Bin {}'.format(i + 1)
+
     def __assign_bin(self, x, cutoffpoints):
         """
         x:变量的value
         cutoffpoints:分箱的切割点
         """
         bin_num = len(cutoffpoints) + 1  # 箱体个数
-        if x <= cutoffpoints[0]:  # 如果x小于最小的cutoff点，则映射为Bin 0
+        if not cutoffpoints or x <= cutoffpoints[0]:  # 如果cutoffpoints为空或x小于最小的cutoff点，则映射为Bin 0
             return 'Bin 0'
         elif x > cutoffpoints[-1]:  # 如果x大于最大的cutoff点，则映射为Bin(bin_num-1)
             return 'Bin {}'.format(bin_num - 1)
@@ -310,11 +325,19 @@ class BinningModule:
                     n = n + 1
                 bucket = pd.qcut(df[col], n - 1)
                 print(bucket)
+            # todo: ChiMerge Bug: cut point dulp
             elif method == 'ChiMerge':  # 卡方
                 cut = self.__chi_merge(df, col, target, max_bin=max_bin, min_binpct=min_binpct)
                 cut.insert(0, ninf)
                 cut.append(inf)
                 bucket = pd.cut(df[col], cut)
+                bucket = sorted(list(set(bucket))) # 去除重复的边界值
+                # 将无穷小和无穷大的边界值加入列表中
+                bucket.insert(0, -float('inf'))
+                bucket.append(float('inf'))
+                # 替换 -inf 为一个非限定的边界值
+                cut = [-float('inf') if x == -float('inf') else x for x in cut]
+
             d1 = df.groupby(bucket)
             d2 = pd.DataFrame()
             d2['min_bin'] = d1[col].min()

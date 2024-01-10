@@ -38,6 +38,7 @@ class Yihuier:
         date_vars = self.get_date_variables()
         numeric_vars = [var for var in num_vars if var not in date_vars]
 
+        print(self.data[self.target].dtype)
         if self.data[self.target].dtype == np.number:
             num_vars.remove(self.target)
         return num_vars
