@@ -15,8 +15,8 @@ from xgboost import XGBClassifier
 
 class VarSelectModule:
 
-    def __init__(self, yihui_instance):
-        self.yihui_instance = yihui_instance
+    def __init__(self, yihuier_instance):
+        self.yihuier_instance = yihuier_instance
         self.xg_fea_imp = None
         self.rf_fea_imp = None
 
@@ -31,10 +31,10 @@ class VarSelectModule:
         xg_fea_imp:变量的特征重要性
         xg_select_col:筛选出的变量
         """
-        target = self.yihui_instance.target
+        target = self.yihuier_instance.target
 
-        x = self.yihui_instance.data[col_list].copy()
-        y = self.yihui_instance.data[target]
+        x = self.yihuier_instance.data[col_list].copy()
+        y = self.yihuier_instance.data[target]
 
         xgmodel = XGBClassifier(random_state=0)
         xgmodel = xgmodel.fit(x, y, eval_metric='auc')
@@ -58,10 +58,10 @@ class VarSelectModule:
         rf_fea_imp:变量的特征重要性
         rf_select_col:筛选出的变量
         """
-        target = self.yihui_instance.target
+        target = self.yihuier_instance.target
 
-        x = self.yihui_instance.data[col_list].copy()
-        y = self.yihui_instance.data[target]
+        x = self.yihuier_instance.data[col_list].copy()
+        y = self.yihuier_instance.data[target]
 
         rfmodel = RandomForestClassifier(random_state=0)
         rfmodel = rfmodel.fit(x, y)
@@ -85,7 +85,7 @@ class VarSelectModule:
 
         return :相关性热力图
         """
-        df = self.yihui_instance.data.copy()
+        df = self.yihuier_instance.data.copy()
 
         corr_df = df.loc[:, col_list].corr()
         plt.figure(figsize=plt_size)
@@ -104,7 +104,7 @@ class VarSelectModule:
 
         return:强相关性变量之间的映射关系表
         """
-        df = self.yihui_instance.data.copy()
+        df = self.yihuier_instance.data.copy()
 
         corr_df = df.loc[:, col_list].corr()
         col_a = []
@@ -144,7 +144,7 @@ class VarSelectModule:
 
         return:相关性剔除后的变量
         """
-        df = self.yihui_instance.data.copy()
+        df = self.yihuier_instance.data.copy()
 
         list_corr = col_list[:]
         for col in list_corr:
@@ -201,13 +201,13 @@ class VarSelectModule:
                             break  # 如果删除了row，则没办法继续for循环，所以要break
             return list_corr
 
-        df = self.yihui_instance.data.copy()
+        df = self.yihuier_instance.data.copy()
 
-        if self.yihui_instance.binning_module.iv_df is not None:
-            print(self.yihui_instance.binning_module.iv_df)
-            iv_rank = self.yihui_instance.binning_module.iv_df.sort_values(by='iv',ascending=False)
-        elif self.yihui_instance.binning_module.iv_df is None:
-            _, iv_rank = self.yihui_instance.binning_module.iv_num(
+        if self.yihuier_instance.binning_module.iv_df is not None:
+            print(self.yihuier_instance.binning_module.iv_df)
+            iv_rank = self.yihuier_instance.binning_module.iv_df.sort_values(by='iv',ascending=False)
+        elif self.yihuier_instance.binning_module.iv_df is None:
+            _, iv_rank = self.yihuier_instance.binning_module.iv_num(
                 col_list, max_bin=20, min_binpct=0, method='ChiMerge')
 
         # iv_rank = iv_rank.sort_values(by='iv',ascending=False)
@@ -257,7 +257,7 @@ class VarSelectModule:
                             break  # 如果删除了row，则没办法继续for循环，所以要break
             return list_corr
 
-        df = self.yihui_instance.data.copy()
+        df = self.yihuier_instance.data.copy()
 
         if type == 'xgboost':
             if self.xg_fea_imp is not None:

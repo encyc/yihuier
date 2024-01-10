@@ -4,18 +4,18 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 
 class DataProcessingModule:
-    def __init__(self, yihui_instance):
-        self.yihui_instance = yihui_instance
+    def __init__(self, yihuier_instance):
+        self.yihuier_instance = yihuier_instance
 
     def __missing_var_cal(self):
         """
         calculate var missing pct
         """
-        total = self.yihui_instance.data.shape[0]
-        missing_count = self.yihui_instance.data.isnull().sum()
+        total = self.yihuier_instance.data.shape[0]
+        missing_count = self.yihuier_instance.data.isnull().sum()
         missing_pct = missing_count/total
         missing_data = pd.DataFrame({
-            'index': self.yihui_instance.data.columns.tolist(),
+            'index': self.yihuier_instance.data.columns.tolist(),
             'total_obs': total,
             'missing_count': missing_count,
             'missing_pct': missing_pct
@@ -26,11 +26,11 @@ class DataProcessingModule:
         """
         calculate obs missing pct
         """
-        total = len(self.yihui_instance.data.columns)
-        missing_count = self.yihui_instance.data.isnull().sum(axis=1)
+        total = len(self.yihuier_instance.data.columns)
+        missing_count = self.yihuier_instance.data.isnull().sum(axis=1)
         missing_pct = missing_count / total
         missing_data = pd.DataFrame({
-            'index': self.yihui_instance.data.index.tolist(),
+            'index': self.yihuier_instance.data.index.tolist(),
             'total_obs': total,
             'missing_count': missing_count,
             'missing_pct': missing_pct
@@ -84,7 +84,7 @@ class DataProcessingModule:
 
         return :填充后的数据集
         """
-        data2 = self.yihui_instance.data.copy()
+        data2 = self.yihuier_instance.data.copy()
         for col in col_list:
             if fill_type == 'class':
                 data2[col] = data2[col].fillna(fill_str)
@@ -106,7 +106,7 @@ class DataProcessingModule:
 
         return:已填充好的数据集
         """
-        data2 = self.yihui_instance.data.copy()
+        data2 = self.yihuier_instance.data.copy()
         for col in col_list:
             if fill_type == '0':
                 data2[col] = data2[col].fillna(0)
@@ -135,7 +135,7 @@ class DataProcessingModule:
 
         return :删除缺失后的数据集
         """
-        data2 = self.yihui_instance.data.copy()
+        data2 = self.yihuier_instance.data.copy()
         missing_data = self.__missing_var_cal()
         missing_col_num = missing_data[missing_data.missing_pct >= threshold].shape[0]
         missing_col = list(missing_data[missing_data.missing_pct >= threshold].index)
@@ -153,7 +153,7 @@ class DataProcessingModule:
         Returns:
         删除缺失后的数据集
         """
-        data2 = self.yihui_instance.data.copy()
+        data2 = self.yihuier_instance.data.copy()
         # 计算每个 observation 中缺失值的数量
         missing_data = self.__missing_obs_cal()
 
@@ -178,13 +178,13 @@ class DataProcessingModule:
         删除常变量/同值化处理后的数据集
         """
         # 计算每一列中唯一值的比例
-        unique_ratio = self.yihui_instance.data.nunique() / len(self.yihui_instance.data)
+        unique_ratio = self.yihuier_instance.data.nunique() / len(self.yihuier_instance.data)
 
         # 找到同值比例超过阈值的列
         const_columns = unique_ratio[unique_ratio >= threshold].index
 
         # 删除常变量/同值化处理后的数据集
-        data_after_const_delete = self.yihui_instance.data.drop(columns=const_columns)
+        data_after_const_delete = self.yihuier_instance.data.drop(columns=const_columns)
 
         print('删除常变量/同值化处理后的变量个数为{},名字为{}'.format(len(const_columns),const_columns))
         print(data_after_const_delete.shape[1])
@@ -198,9 +198,9 @@ class DataProcessingModule:
         Returns:
         删除缺失目标变量后的数据集
         """
-        if self.yihui_instance.target is not None:
-            data_without_missing_target = self.yihui_instance.data.dropna(subset=[self.yihui_instance.target])
-            missing_target_count = len(self.yihui_instance.data) - len(data_without_missing_target)
+        if self.yihuier_instance.target is not None:
+            data_without_missing_target = self.yihuier_instance.data.dropna(subset=[self.yihuier_instance.target])
+            missing_target_count = len(self.yihuier_instance.data) - len(data_without_missing_target)
             print('删除目标变量缺失的观测数: {}'.format(missing_target_count))
             return data_without_missing_target
         else:
@@ -218,7 +218,7 @@ class DataProcessingModule:
         - data_with_binary: pd.DataFrame, 包含二进制变量的数据集
         """
 
-        data = self.yihui_instance.data.copy()
+        data = self.yihuier_instance.data.copy()
         # 创建一个二进制变量，表示日期是否存在
         for col in col_list:
             data[col + '_binary'] = 0
@@ -226,5 +226,5 @@ class DataProcessingModule:
             if not replace:
                 # 如果需要保留原始日期变量，可以选择删除原始日期列
                 data.drop(columns=[col], inplace=True)
-
+                data.reset_index(drop=True, inplace=True)
         return data

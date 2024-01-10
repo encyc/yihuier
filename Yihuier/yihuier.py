@@ -1,8 +1,8 @@
-from Yihui.binning import BinningModule
-from Yihui.eda import EDAModule
-from Yihui.data_processing import DataProcessingModule
-from Yihui.cluster import ClusterMuodule
-from Yihui.var_selelct import VarSelectModule
+from Yihuier.binning import BinningModule
+from Yihuier.eda import EDAModule
+from Yihuier.data_processing import DataProcessingModule
+from Yihuier.cluster import ClusterMuodule
+from Yihuier.var_selelct import VarSelectModule
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ import pandas as pd
 # 导入相关库
 
 
-class Yihui:
+class Yihuier:
     def __init__(self, data, target=None):
         self.data = data
         self.target = target
@@ -46,12 +46,12 @@ class Yihui:
         date_vars = []
 
         for col in self.data.columns:
-            if self.is_numeric_date_format(col):
+            if self.__is_numeric_date_format(col):
                 date_vars.append(col)
 
         return date_vars
 
-    def is_numeric_date_format(self, col):
+    def __is_numeric_date_format(self, col):
         if self.data[col].dropna().empty:
             return False
 
