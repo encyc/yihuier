@@ -52,11 +52,12 @@ if __name__ == "__main__":
     col_list = []
     for col in yi.get_numeric_variables():
         try:
-            _, iv_value = yi.binning_module.binning_num([col], 10, 0, 'freq')
-            col_list.append(col)
-            iv_list.append(iv_value[0])
+            # _, iv_value = yi.binning_module.binning_num([col], 10, 0, 'freq')
+            _, iv_value = yi.binning_module.binning_num([col], 10, 0, 'ChiMerge')
 
             # 处理 iv_value 或其他逻辑
+            col_list.append(col)
+            iv_list.append(iv_value[0])
         except Exception as e:
             print(f"Error processing variable {col}: {str(e)}")
             continue  # 如果出现异常，跳过当前变量，继续下一个变量
