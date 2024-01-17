@@ -25,7 +25,8 @@ class Yihuier:
     def get_categorical_variables(self):
         # cate_vars = list(self.data.select_dtypes(include='object').columns)
         cate_vars = self.data.select_dtypes(include=[np.object, 'category']).columns.tolist()
-        if self.data[self.target].dtype == 'object':
+
+        if self.target in cate_vars:
             cate_vars.remove(self.target)
         return cate_vars
 
@@ -36,10 +37,9 @@ class Yihuier:
 
         # 剔除日期型变量
         date_vars = self.get_date_variables()
-        numeric_vars = [var for var in num_vars if var not in date_vars]
+        num_vars = [var for var in num_vars if var not in date_vars]
 
-        print(self.data[self.target].dtype)
-        if self.data[self.target].dtype == np.number:
+        if self.target in num_vars:
             num_vars.remove(self.target)
         return num_vars
 
