@@ -3,6 +3,7 @@ from Yihuier.eda import EDAModule
 from Yihuier.data_processing import DataProcessingModule
 from Yihuier.cluster import ClusterMuodule
 from Yihuier.var_selelct import VarSelectModule
+from Yihuier.woe_transform import WOETransformModule
 
 import numpy as np
 import pandas as pd
@@ -19,6 +20,7 @@ class Yihuier:
         self.cluster_module = ClusterMuodule(self)
         self.binning_module = BinningModule(self)
         self.var_select_module = VarSelectModule(self)
+        self.woe_transform_module = WOETransformModule(self)
         # 其他模块的初始化...
 
     # 提取字符型变量的名字并返回一个list

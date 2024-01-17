@@ -78,6 +78,8 @@ Encyc 修改补充重构
 
 ### 5.binning.py
 
+1. 分箱
+
 * binning_cate  -- 类别型变量的分箱
 * iv_cate       -- 类别型变量的IV明细表
 * binning_num   -- 数值型变量的分箱（使用卡方分箱）
@@ -86,6 +88,11 @@ Encyc 修改补充重构
 * plot_woe     -- 变量woe的可视化
 * woe_monoton  -- 检验变量的woe是否呈单调变化
 * woe_large    -- 检验变量某个箱的woe是否过大(大于1),PS:箱体的woe在（-1,1）较合理
+
+2. 编码
+
+* woe_df_concat -- 变量woe结果明细表
+* woe_transform -- 变量woe转换
 
 
 ### 6.var_select.py
@@ -101,12 +108,8 @@ Encyc 修改补充重构
 * forward_delete_coef   -- 逻辑回归系数符号筛选（每个变量的系数符号需要一致）
 * depth_first_search    -- 暴力搜索特定组合的col_list的ks，并组建叠加变量数量
 
-### 7.woe_discrete.py
 
-* woe_df_concat -- 变量woe结果明细表
-* woe_transform -- 变量woe转换
-
-### 8.model_evaluation.py
+### 7.model_evaluation.py
 
 * plot_roc -- 绘制ROC曲线
 * plot_model_ks -- 绘制模型的KS曲线
@@ -114,7 +117,7 @@ Encyc 修改补充重构
 * cross_verify -- 交叉验证
 * plot_matrix_report -- 混淆矩阵/分类结果报告
 
-### 9.model_implement.py
+### 8.model_implement.py
 
 * cal_scale -- 评分卡刻度
 * score_df_concat -- 变量score的明细表
@@ -126,7 +129,7 @@ Encyc 修改补充重构
 * plot_lifting -- 绘制提升图和洛伦兹曲线
 * rule_verify -- 设定cutoff点，计算衡量指标
 
-### 10.model_monitor.py
+### 9.model_monitor.py
 
 * score_psi -- 计算评分的PSI
 * plot_score_compare -- 评分对比图
@@ -134,6 +137,6 @@ Encyc 修改补充重构
 * plot_var_shift -- 变量偏移分析
 
 
-### 11.datamerchant_tools.py
+### 10.datamerchant_tools.py
 
 * weight_ks -- 计算加权之后的模型KS以及区间坏率
