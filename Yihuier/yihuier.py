@@ -3,6 +3,9 @@ from Yihuier.eda import EDAModule
 from Yihuier.data_processing import DataProcessingModule
 from Yihuier.cluster import ClusterMuodule
 from Yihuier.var_selelct import VarSelectModule
+from Yihuier.model_evaluation import ModelEvaluationModule
+from Yihuier.scorecard_implement import ScorecardImplementModule
+
 
 import numpy as np
 import pandas as pd
@@ -19,6 +22,8 @@ class Yihuier:
         self.cluster_module = ClusterMuodule(self)
         self.binning_module = BinningModule(self)
         self.var_select_module = VarSelectModule(self)
+        self.me_module = ModelEvaluationModule(self)
+        self.si_module = ScorecardImplementModule(self)
         # 其他模块的初始化...
 
     # 提取字符型变量的名字并返回一个list
