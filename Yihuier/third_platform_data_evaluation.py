@@ -77,5 +77,7 @@ if __name__ == "__main__":
     # rf_fea_imp.to_csv("Data/rf_fea_imp.csv", index=False)
     # print("rf_fea_imp:{}".format(rf_fea_imp))
 
-    twice = yi.var_select_module.forward_delete_corr_ivfirst(yi.get_numeric_variables(),threshold=0.3)
-    print(twice)
+    # twice = yi.var_select_module.forward_delete_corr_ivfirst(yi.get_numeric_variables(),threshold=0.3)
+    # print(twice)
+
+    yi.binning_module.woe_df_concat()
