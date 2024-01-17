@@ -44,7 +44,9 @@ if __name__ == "__main__":
     #     #         l.append(i)
     #
     yi.data = yi.dp_module.fillna_num_var(yi.get_numeric_variables(), fill_type='class', fill_class_num=-999)
+    yi.data = yi.dp_module.delete_missing_var(threshold=0.01)
     # yi.dp_module.plot_bar_missing_var()
+
 
     # iv_list = []
     # col_list = []
@@ -66,11 +68,14 @@ if __name__ == "__main__":
     # print("iv_value:{}".format(iv))
     #
     # iv.to_csv("Data/iv_yinlian.csv", index=False)
+    #
+    # xg_fea_imp, _, _ = yi.var_select_module.select_xgboost(yi.get_numeric_variables())
+    # xg_fea_imp.to_csv("Data/xg_fea_imp.csv", index=False)
+    # print("xg_fea_imp:{}".format(xg_fea_imp))
+    #
+    # rf_fea_imp, _ = yi.var_select_module.select_rf(yi.get_numeric_variables())
+    # rf_fea_imp.to_csv("Data/rf_fea_imp.csv", index=False)
+    # print("rf_fea_imp:{}".format(rf_fea_imp))
 
-    xg_fea_imp, _, _ = yi.var_select_module.select_xgboost(yi.get_numeric_variables())
-    xg_fea_imp.to_csv("Data/xg_fea_imp.csv", index=False)
-    print("xg_fea_imp:{}".format(xg_fea_imp))
-
-    rf_fea_imp, _ = yi.var_select_module.select_rf(yi.get_numeric_variables())
-    rf_fea_imp.to_csv("Data/rf_fea_imp.csv", index=False)
-    print("rf_fea_imp:{}".format(rf_fea_imp))
+    twice = yi.var_select_module.forward_delete_corr_ivfirst(yi.get_numeric_variables(),threshold=0.3)
+    print(twice)

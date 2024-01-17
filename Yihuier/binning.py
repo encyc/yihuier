@@ -391,7 +391,7 @@ class BinningModule:
         df = self.yihuier_instance.data.copy()
         target = self.yihuier_instance.target
 
-        bin_df, iv_value = self.binning_num(col_list, max_bin=max_bin, min_binpct=min_binpct, method='ChiMerge')
+        bin_df, iv_value = self.binning_num(col_list, max_bin=max_bin, min_binpct=min_binpct, method='freq')
         iv_df = pd.DataFrame({'col': col_list,
                               'iv': iv_value})
         self.iv_df = iv_df

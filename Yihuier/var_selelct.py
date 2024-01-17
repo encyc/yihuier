@@ -205,12 +205,13 @@ class VarSelectModule:
 
         if self.yihuier_instance.binning_module.iv_df is not None:
             print(self.yihuier_instance.binning_module.iv_df)
-            iv_rank = self.yihuier_instance.binning_module.iv_df.sort_values(by='iv',ascending=False)
+            iv_rank = self.yihuier_instance.binning_module.iv_df#.sort_values(by='iv',ascending=False)
         elif self.yihuier_instance.binning_module.iv_df is None:
-            _, iv_rank = self.yihuier_instance.binning_module.iv_num(
-                col_list, max_bin=20, min_binpct=0, method='ChiMerge')
+            iv_rank = self.yihuier_instance.binning_module.iv_num(
+                col_list, max_bin=20, min_binpct=0, method='freq')
 
         # iv_rank = iv_rank.sort_values(by='iv',ascending=False)
+        print(iv_rank)
 
         once = up_triangle(df, col_list, iv_rank=iv_rank, threshold=threshold)
         twice = up_triangle(df, once, iv_rank=iv_rank, threshold=threshold)
