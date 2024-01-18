@@ -372,6 +372,7 @@ class BinningModule:
             bin_df.append(d2)
             iv_value.append(iv)
             d2.reset_index(inplace=True)
+            self.bin_df = bin_df
         return bin_df, iv_value
 
     # 数值型变量的iv明细表
