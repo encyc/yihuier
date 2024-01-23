@@ -15,6 +15,7 @@ class BinningModule:
         self.iv_df = None
         self.ks_df = None
         self.woe_result_df = None
+        self.data_woe = None
 
     def binning_cate(self, col_list):
         df = self.yihuier_instance.data
@@ -667,4 +668,5 @@ class BinningModule:
             bin_res = pd.Series(bin_res, index=x.index)
             bin_res.name = x.name
             df2[col] = bin_res
+        self.data_woe = df2
         return df2

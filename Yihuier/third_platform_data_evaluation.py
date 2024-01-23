@@ -82,3 +82,6 @@ if __name__ == "__main__":
     yi.binned = yi.binning_module.binning_num(yi.get_numeric_variables(),10, 0,method='freq')
     yi.binning_module.woe_df_concat()
     print(yi.binning_module.woe_result_df)
+
+    yi.binning_module.woe_transform()
+    print(yi.binning_module.data_woe)

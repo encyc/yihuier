@@ -1,7 +1,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = '0.1.11'
+VERSION = '0.1.12'
 
 with open("README.md", "r", encoding='utf-8') as fh:
     long_description = fh.read()
@@ -48,3 +48,5 @@ setup(
         'Data': ['*.csv']
     }
 )
+# python setup.py sdist bdist_wheel
+# twine upload --skip-existing dist/*
