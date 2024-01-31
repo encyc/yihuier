@@ -137,6 +137,7 @@ Encyc 修改补充重构
 * plot_var_shift -- 变量偏移分析
 
 
-### 10.datamerchant_tools.py
+### 10.pipline.py
 
-* weight_ks -- 计算加权之后的模型KS以及区间坏率
+* product_test -- 测试第三方数据厂商的风控产品
+* best_model -- 根据数据集自动生成最佳逻辑回归模型
