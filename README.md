@@ -4,6 +4,8 @@
 
 Forked https://github.com/taenggu0309/Scorecard--Function 
 
+项目知乎贴 https://zhuanlan.zhihu.com/p/675830391?
+
 Encyc 修改补充重构
 
 ## 评分卡模型实现函数模块

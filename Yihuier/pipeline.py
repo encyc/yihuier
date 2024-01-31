@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 
-class PipeLineModule:
+class PipelineModule:
 
     def __init__(self, yihuier_instance):
         self.yihuier_instance = yihuier_instance
