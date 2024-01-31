@@ -645,6 +645,7 @@ class BinningModule:
         df2 = self.yihuier_instance.data.copy()
         target = self.yihuier_instance.target
         df_woe = self.woe_result_df
+        print(df2.drop([target], axis=1))
 
         for col in df2.drop([target], axis=1).columns:
             x = df2[col]

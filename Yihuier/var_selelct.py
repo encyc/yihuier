@@ -19,6 +19,7 @@ class VarSelectModule:
         self.yihuier_instance = yihuier_instance
         self.xg_fea_imp = None
         self.rf_fea_imp = None
+        self.selected_var = None
 
     # xgboost筛选变量
     def select_xgboost(self, col_list, imp_num=None):

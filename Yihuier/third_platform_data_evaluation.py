@@ -79,9 +79,10 @@ if __name__ == "__main__":
 
     # twice = yi.var_select_module.forward_delete_corr_ivfirst(yi.get_numeric_variables(),threshold=0.3)
     # print(twice)
-    yi.binned = yi.binning_module.binning_num(yi.get_numeric_variables(),10, 0,method='freq')
+    yi.bin_df = yi.binning_module.binning_num(yi.get_numeric_variables(),10, 0,method='freq')
     yi.binning_module.woe_df_concat()
     print(yi.binning_module.woe_result_df)
 
+    print('sir, this way')
     yi.binning_module.woe_transform()
     print(yi.binning_module.data_woe)
