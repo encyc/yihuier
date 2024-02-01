@@ -28,7 +28,7 @@ class PipelineModule:
         # 删除数值型变量
         self.yihuier_instance.data = self.yihuier_instance.dp_module.delete_missing_var(threshold=0.01)
         # 展示空值分布
-        self.yihuier_instance.dp_module.plot_bar_missing_var()
+        # self.yihuier_instance.dp_module.plot_bar_missing_var()
 
         # 对每个数值变量做分箱，并计算IV
         iv_list = []
@@ -48,38 +48,29 @@ class PipelineModule:
                 print(f"Error processing variable {col}: {str(e)}")
                 continue  # 如果出现异常，跳过当前变量，继续下一个变量
         iv = pd.DataFrame({'col': col_list, 'iv': iv_list})
-        print("iv_value:{}".format(iv))
-        # iv.to_csv("Data/iv_qubei.csv", index=False)
-
         xg_fea_imp, _, _ = self.yihuier_instance.var_select_module.select_xgboost(self.yihuier_instance.get_numeric_variables())
-        print("xg_fea_imp:{}".format(xg_fea_imp))
-        # xg_fea_imp.to_csv("Data/xg_fea_imp_qubei.csv", index=False)
-
         rf_fea_imp, _ = self.yihuier_instance.var_select_module.select_rf(self.yihuier_instance.get_numeric_variables())
-        print("rf_fea_imp:{}".format(rf_fea_imp))
-        # rf_fea_imp.to_csv("Data/rf_fea_imp_qubei.csv", index=False)
 
         # 合并DataFrame
         fea_csv = iv.merge(xg_fea_imp, on='col', how='outer')
         fea_csv = fea_csv.merge(rf_fea_imp, on='col', how='outer', suffixes=('_xgb', '_rf'))
         print(fea_csv)
-        fea_csv.to_csv("Data/fea.csv", index=False)
-
+        return fea_csv
 
 
 # 示例
-# if __name__ == "__main__":
-#     from Yihuier.yihuier import Yihuier
-#
-#     # ban FutureWarning
-#     warnings.filterwarnings('ignore')
-#
-#     # generate data.csv
-#     with open("Data/result_hebing.csv", "r") as f:
-#         data = pd.read_csv(f)
-#     print(data.head())
-#
-#
-#     df = data.copy()
-#     yi = Yihuier(df, 'dlq')
-#     yi.pipeline_module.product_test()
+if __name__ == "__main__":
+    from Yihuier.yihuier import Yihuier
+
+    # ban FutureWarning
+    warnings.filterwarnings('ignore')
+
+    # generate data.csv
+    with open("Data/result_hebing.csv", "r") as f:
+        data = pd.read_csv(f)
+    print(data.head())
+
+
+    df = data.copy()
+    yi = Yihuier(df, 'dlq')
+    yi.pipeline_module.product_test()
