@@ -2,9 +2,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from ydata_profiling import ProfileReport
-
-import pandas as pd
-import numpy as np
 from scipy.stats import entropy
 
 class EDAModule:

@@ -27,8 +27,8 @@ Encyc 修改补充重构
 * plot_default_num  -- 数值型变量的违约率分析
 
 3. 自动EDA
-* 使用ydata_profiling自动分析数据集
-* 快速自动分析数据集（无图）
+* auto_eda_profiling -- 使用ydata_profiling自动分析数据集（有图，慢）
+* auto_eda_simple -- 快速自动分析数据集（无图）
 
 ### 2. data_processing.py
 
