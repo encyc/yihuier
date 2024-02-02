@@ -1,7 +1,7 @@
 
 if __name__ == "__main__":
 
-    money = 4
+    money = 20
     count = money//2
     bottle = count
     cap = count
