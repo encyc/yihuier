@@ -1,25 +1,30 @@
-
+# 示例
 if __name__ == "__main__":
+    from Yihuier.yihuier import Yihuier
+    import warnings
+    import pandas as pd
 
-    money = 20
-    count = money//2
-    bottle = count
-    cap = count
+    # ban FutureWarning
+    warnings.filterwarnings('ignore')
 
-    while cap//4 >0 or bottle//2 >0:
-        cap_num = cap//4
-        bottle_num = bottle//2
-        count_num = cap_num + bottle_num
-        cap = cap%4 + count_num
-        bottle = bottle%2 + count_num
-        count = count+count_num
-        print(count,cap,bottle,cap_num,bottle_num,count_num)
 
-    # while cap//3 >0 or bottle//1 >0:
-    #     cap_num = cap//3
-    #     bottle_num = bottle//1
-    #     count_num = cap_num + bottle_num
-    #     cap = cap%3 + count_num
-    #     bottle = bottle%1 + count_num
-    #     count = count+count_num
-    #     print(count,cap,bottle,cap_num,bottle_num,count_num)
+    import os
+    dir = "Data/talkingdata/TD测试结果_广州智租"
+
+    filename = os.listdir(dir)
+    print(filename)
+
+    # generate data.csv
+    for i in filename:
+        print(i)
+        try:
+            with open(f"{dir}/{i}", "r") as f:
+                data = pd.read_csv(f)
+            print(data.head())
+
+            df = data.copy()
+            yi = Yihuier(df, 'dlq')
+            result = yi.pipeline_module.product_test()
+            result.to_csv(f"{dir}/result/{i}")
+        except Exception as e:
+            print(e)
