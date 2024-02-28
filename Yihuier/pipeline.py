@@ -59,18 +59,18 @@ class PipelineModule:
 
 
 # 示例
-if __name__ == "__main__":
-    from Yihuier.yihuier import Yihuier
-
-    # ban FutureWarning
-    warnings.filterwarnings('ignore')
-
-    # generate data.csv
-    with open("Data/result_hebing.csv", "r") as f:
-        data = pd.read_csv(f)
-    print(data.head())
-
-
-    df = data.copy()
-    yi = Yihuier(df, 'dlq')
-    yi.pipeline_module.product_test()
+# if __name__ == "__main__":
+#     from Yihuier.yihuier import Yihuier
+#
+#     # ban FutureWarning
+#     warnings.filterwarnings('ignore')
+#
+#     # generate data.csv
+#     with open("Data/result_hebing.csv", "r") as f:
+#         data = pd.read_csv(f)
+#     print(data.head())
+#
+#
+#     df = data.copy()
+#     yi = Yihuier(df, 'dlq')
+#     yi.pipeline_module.product_test()
