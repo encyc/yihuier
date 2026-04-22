@@ -1,12 +1,11 @@
-from typing import Optional, Tuple, Union
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn import metrics
-from sklearn.model_selection import cross_val_score
 from sklearn.base import BaseEstimator
+from sklearn.model_selection import cross_val_score
+
 
 class ModelEvaluationModule:
-
     def __init__(self, yihuier_instance) -> None:
         """初始化模型评估模块
 
@@ -14,9 +13,8 @@ class ModelEvaluationModule:
             yihuier_instance: Yihuier 主实例
         """
         self.yihuier_instance = yihuier_instance
-        self.y_label: Optional[np.ndarray] = None
-        self.y_pred: Optional[np.ndarray] = None
-
+        self.y_label: np.ndarray | None = None
+        self.y_pred: np.ndarray | None = None
 
     # plot AUC
     def plot_roc(self, y_label: np.ndarray, y_pred: np.ndarray) -> None:
@@ -30,12 +28,12 @@ class ModelEvaluationModule:
         AUC = metrics.roc_auc_score(y_label, y_pred)
         fig = plt.figure(figsize=(6, 4))
         ax = fig.add_subplot(1, 1, 1)
-        ax.plot(tpr, fpr, color='blue', label='AUC=%.3f' % AUC)
-        ax.plot([0, 1], [0, 1], 'r--')
+        ax.plot(tpr, fpr, color="blue", label=f"AUC={AUC:.3f}")
+        ax.plot([0, 1], [0, 1], "r--")
         ax.set_ylim(0, 1)
         ax.set_xlim(0, 1)
-        ax.set_title('ROC')
-        ax.legend(loc='best')
+        ax.set_title("ROC")
+        ax.legend(loc="best")
         plt.show()
 
     # plot KS
@@ -50,7 +48,7 @@ class ModelEvaluationModule:
         label_list = list(y_label)
         total_bad = sum(label_list)
         total_good = len(label_list) - total_bad
-        items = sorted(zip(pred_list, label_list), key=lambda x: x[0])
+        items = sorted(zip(pred_list, label_list, strict=True), key=lambda x: x[0])
         step = (max(pred_list) - min(pred_list)) / 200
 
         pred_bin = []
@@ -72,11 +70,11 @@ class ModelEvaluationModule:
 
         fig = plt.figure(figsize=(8, 6))
         ax = fig.add_subplot(1, 1, 1)
-        ax.plot(pred_bin, good_rate, color='green', label='good_rate')
-        ax.plot(pred_bin, bad_rate, color='red', label='bad_rate')
-        ax.plot(pred_bin, ks_list, color='blue', label='good-bad')
-        ax.set_title('KS:{:.3f}'.format(max(ks_list)))
-        ax.legend(loc='best')
+        ax.plot(pred_bin, good_rate, color="green", label="good_rate")
+        ax.plot(pred_bin, bad_rate, color="red", label="bad_rate")
+        ax.plot(pred_bin, ks_list, color="blue", label="good-bad")
+        ax.set_title(f"KS:{max(ks_list):.3f}")
+        ax.legend(loc="best")
         plt.show()
 
     # KS
@@ -91,7 +89,7 @@ class ModelEvaluationModule:
         label_list = list(y_label)
         total_bad = sum(label_list)
         total_good = len(label_list) - total_bad
-        items = sorted(zip(pred_list, label_list), key=lambda x: x[0])
+        items = sorted(zip(pred_list, label_list, strict=True), key=lambda x: x[0])
         step = (max(pred_list) - min(pred_list)) / 200
 
         pred_bin = []
@@ -113,16 +111,15 @@ class ModelEvaluationModule:
             ks_max = max(ks_list)
         return ks_max
 
-
     # 学习曲线
     def plot_learning_curve(
         self,
         estimator: BaseEstimator,
         x: np.ndarray,
         y: np.ndarray,
-        cv: Optional[int] = None,
+        cv: int | None = None,
         train_size: np.ndarray = np.linspace(0.1, 1.0, 5),
-        plt_size: Optional[Tuple[int, int]] = None
+        plt_size: tuple[int, int] | None = None,
     ) -> None:
         """
         estimator :画学习曲线的基模型
@@ -135,26 +132,34 @@ class ModelEvaluationModule:
         return:学习曲线
         """
         from sklearn.model_selection import learning_curve
-        train_sizes, train_scores, test_scores = learning_curve(estimator=estimator,
-                                                                X=x,
-                                                                y=y,
-                                                                cv=cv,
-                                                                n_jobs=-1,
-                                                                train_sizes=train_size)
+
+        train_sizes, train_scores, test_scores = learning_curve(
+            estimator=estimator, X=x, y=y, cv=cv, n_jobs=-1, train_sizes=train_size
+        )
         train_scores_mean = np.mean(train_scores, axis=1)
         train_scores_std = np.std(train_scores, axis=1)
         test_scores_mean = np.mean(test_scores, axis=1)
         test_scores_std = np.std(test_scores, axis=1)
         plt.figure(figsize=plt_size)
-        plt.xlabel('Training-example')
-        plt.ylabel('score')
-        plt.fill_between(train_sizes, train_scores_mean - train_scores_std,
-                         train_scores_mean + train_scores_std, alpha=0.1, color='r')
-        plt.fill_between(train_sizes, test_scores_mean - test_scores_std,
-                         test_scores_mean + test_scores_std, alpha=0.1, color='g')
-        plt.plot(train_sizes, train_scores_mean, 'o-', color='r', label='Training-score')
-        plt.plot(train_sizes, test_scores_mean, 'o-', color='g', label='cross-val-score')
-        plt.legend(loc='best')
+        plt.xlabel("Training-example")
+        plt.ylabel("score")
+        plt.fill_between(
+            train_sizes,
+            train_scores_mean - train_scores_std,
+            train_scores_mean + train_scores_std,
+            alpha=0.1,
+            color="r",
+        )
+        plt.fill_between(
+            train_sizes,
+            test_scores_mean - test_scores_std,
+            test_scores_mean + test_scores_std,
+            alpha=0.1,
+            color="g",
+        )
+        plt.plot(train_sizes, train_scores_mean, "o-", color="r", label="Training-score")
+        plt.plot(train_sizes, test_scores_mean, "o-", color="g", label="cross-val-score")
+        plt.legend(loc="best")
         return plt.show()
 
     # 交叉验证
@@ -164,7 +169,7 @@ class ModelEvaluationModule:
         y: np.ndarray,
         estimators: BaseEstimator,
         fold: int,
-        scoring: str = 'roc_auc'
+        scoring: str = "roc_auc",
     ) -> None:
         """
         x:自变量的数据集
@@ -175,17 +180,23 @@ class ModelEvaluationModule:
 
         return:交叉验证的结果
         """
-        cv_result = cross_val_score(estimator=estimators, X=x, y=y, cv=fold, n_jobs=-1, scoring=scoring)
-        print('CV biggest AUC:{}'.format(cv_result.max()))
-        print('CV smallest AUC:{}'.format(cv_result.min()))
-        print('CV average AUC:{}'.format(cv_result.mean()))
+        cv_result = cross_val_score(
+            estimator=estimators, X=x, y=y, cv=fold, n_jobs=-1, scoring=scoring
+        )
+        print(f"CV biggest AUC:{cv_result.max()}")
+        print(f"CV smallest AUC:{cv_result.min()}")
+        print(f"CV average AUC:{cv_result.mean()}")
         plt.figure(figsize=(6, 4))
-        plt.title('cross verify score distribution')
-        plt.boxplot(cv_result, patch_artist=True, showmeans=True,
-                    boxprops={'color': 'black', 'facecolor': 'yellow'},
-                    meanprops={'marker': 'D', 'markerfacecolor': 'tomato'},
-                    flierprops={'marker': 'o', 'markerfacecolor': 'red', 'color': 'black'},
-                    medianprops={'linestyle': '--', 'color': 'orange'})
+        plt.title("cross verify score distribution")
+        plt.boxplot(
+            cv_result,
+            patch_artist=True,
+            showmeans=True,
+            boxprops={"color": "black", "facecolor": "yellow"},
+            meanprops={"marker": "D", "markerfacecolor": "tomato"},
+            flierprops={"marker": "o", "markerfacecolor": "red", "color": "black"},
+            medianprops={"linestyle": "--", "color": "orange"},
+        )
         return plt.show()
 
     # plot_matrix_report(y_test,y_pred_proc)
@@ -204,9 +215,9 @@ class ModelEvaluationModule:
 
         for x in range(len(matrix_array)):
             for y in range(len(matrix_array)):
-                plt.annotate(matrix_array[x, y], xy=(x, y), ha='center', va='center')
+                plt.annotate(matrix_array[x, y], xy=(x, y), ha="center", va="center")
 
-        plt.xlabel('True label')
-        plt.ylabel('Predict label')
+        plt.xlabel("True label")
+        plt.ylabel("Predict label")
         print(metrics.classification_report(y_label, y_pred))
         return plt.show()

@@ -1,15 +1,15 @@
-from typing import Optional, List, Tuple
 import matplotlib.pyplot as plt
-import matplotlib.figure
 import pandas as pd
 import seaborn as sns
 from scipy.stats import entropy
 
 try:
     from ydata_profiling import ProfileReport
+
     YDATA_PROFILING_AVAILABLE = True
 except ImportError:
     YDATA_PROFILING_AVAILABLE = False
+
 
 class EDAModule:
     def __init__(self, yihuier_instance) -> None:
@@ -20,20 +20,20 @@ class EDAModule:
         """
         self.yihuier_instance = yihuier_instance
         self.data: pd.DataFrame = self.yihuier_instance.data.copy()
-        self.variables = pd.Index = self.yihuier_instance.data.columns
-        self.category_variables: List[str] = self.yihuier_instance.get_categorical_variables()
-        self.numeric_variables: List[str] = self.yihuier_instance.get_numeric_variables()
+        self.variables = self.yihuier_instance.data.columns
+        self.category_variables: list[str] = self.yihuier_instance.get_categorical_variables()
+        self.numeric_variables: list[str] = self.yihuier_instance.get_numeric_variables()
 
     # 类别型变量的分布
     def plot_cate_var(
         self,
-        col_list: List[str],
+        col_list: list[str],
         hspace: float = 0.4,
         wspace: float = 0.4,
-        plt_size: Optional[Tuple[int, int]] = None,
-        plt_num: Optional[int] = None,
-        x: Optional[int] = None,
-        y: Optional[int] = None
+        plt_size: tuple[int, int] | None = None,
+        plt_num: int | None = None,
+        x: int | None = None,
+        y: int | None = None,
     ) -> None:
         """
         self.yihuier_instance.data:数据集
@@ -49,26 +49,26 @@ class EDAModule:
         """
         plt.figure(figsize=plt_size)
         plt.subplots_adjust(hspace=hspace, wspace=wspace)
-        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
-        plt.rcParams['axes.unicode_minus'] = False
-        for i, col in zip(range(1, plt_num + 1, 1), col_list):
+        plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
+        plt.rcParams["axes.unicode_minus"] = False
+        for i, col in zip(range(1, plt_num + 1, 1), col_list, strict=True):
             plt.subplot(x, y, i)
             plt.title(col)
             sns.countplot(data=self.yihuier_instance.data, y=col)
-            plt.ylabel('')
+            plt.ylabel("")
         return plt.show()
 
     # 数值型变量的分布
     def plot_num_col(
         self,
-        col_list: List[str],
-        plt_type: str = 'hist',
+        col_list: list[str],
+        plt_type: str = "hist",
         hspace: float = 0.4,
         wspace: float = 0.4,
-        plt_size: Optional[Tuple[int, int]] = None,
-        plt_num: Optional[int] = None,
-        x: Optional[int] = None,
-        y: Optional[int] = None
+        plt_size: tuple[int, int] | None = None,
+        plt_num: int | None = None,
+        x: int | None = None,
+        y: int | None = None,
     ) -> None:
         """
         col_list:变量list集合
@@ -84,38 +84,45 @@ class EDAModule:
         """
         plt.figure(figsize=plt_size)
         plt.subplots_adjust(hspace=hspace, wspace=wspace)
-        if plt_type == 'hist':
-            for i, col in zip(range(1, plt_num + 1, 1), col_list):
+        if plt_type == "hist":
+            for i, col in zip(range(1, plt_num + 1, 1), col_list, strict=True):
                 plt.subplot(x, y, i)
                 plt.title(col)
                 sns.distplot(self.yihuier_instance.data[col].dropna())
-                plt.xlabel('')
-        if plt_type == 'box':
-            for i, col in zip(range(1, plt_num + 1, 1), col_list):
+                plt.xlabel("")
+        if plt_type == "box":
+            for i, col in zip(range(1, plt_num + 1, 1), col_list, strict=True):
                 plt.subplot(x, y, i)
                 plt.title(col)
-                sns.boxplot(data=self.yihuier_instance.data, x=col, fliersize=5,
-                            flierprops={'markerfacecolor': 'cornflowerblue', 'markeredgecolor': 'cornflowerblue',
-                                        'markersize': 4}, )
-                plt.xlabel('')
-        if plt_type == 'stripplot':
-            for i, col in zip(range(1, plt_num + 1, 1), col_list):
+                sns.boxplot(
+                    data=self.yihuier_instance.data,
+                    x=col,
+                    fliersize=5,
+                    flierprops={
+                        "markerfacecolor": "cornflowerblue",
+                        "markeredgecolor": "cornflowerblue",
+                        "markersize": 4,
+                    },
+                )
+                plt.xlabel("")
+        if plt_type == "stripplot":
+            for i, col in zip(range(1, plt_num + 1, 1), col_list, strict=True):
                 plt.subplot(x, y, i)
                 plt.title(col)
                 sns.stripplot(data=self.yihuier_instance.data, x=col)
-                plt.xlabel('')
+                plt.xlabel("")
         return plt.show()
 
     # 类别型变量的违约率分析
     def plot_default_cate(
         self,
-        col_list: List[str],
+        col_list: list[str],
         hspace: float = 0.4,
         wspace: float = 0.4,
-        plt_size: Optional[Tuple[int, int]] = None,
-        plt_num: Optional[int] = None,
-        x: Optional[int] = None,
-        y: Optional[int] = None
+        plt_size: tuple[int, int] | None = None,
+        plt_num: int | None = None,
+        x: int | None = None,
+        y: int | None = None,
     ) -> None:
         """
         col_list:变量list集合
@@ -135,33 +142,33 @@ class EDAModule:
 
         plt.figure(figsize=plt_size)
         plt.subplots_adjust(hspace=hspace, wspace=wspace)
-        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
-        plt.rcParams['axes.unicode_minus'] = False
-        for i, col in zip(range(1, plt_num + 1, 1), col_list):
+        plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
+        plt.rcParams["axes.unicode_minus"] = False
+        for i, col in zip(range(1, plt_num + 1, 1), col_list, strict=True):
             d1 = self.yihuier_instance.data.groupby(col)
             d2 = pd.DataFrame()
-            d2['total'] = d1[self.yihuier_instance.target].count()
-            d2['bad'] = d1[self.yihuier_instance.target].sum()
-            d2['default_rate'] = d2['bad'] / d2['total']
+            d2["total"] = d1[self.yihuier_instance.target].count()
+            d2["bad"] = d1[self.yihuier_instance.target].sum()
+            d2["default_rate"] = d2["bad"] / d2["total"]
             d2 = d2.reset_index()
             plt.subplot(x, y, i)
             plt.title(col)
             plt.axvline(x=all_default_rate)
-            sns.barplot(data=d2, y=col, x='default_rate')
-            plt.ylabel('')
+            sns.barplot(data=d2, y=col, x="default_rate")
+            plt.ylabel("")
         return plt.show()
 
     # 数值型变量的违约率分析
     def plot_default_num(
         self,
-        col_list: List[str],
+        col_list: list[str],
         hspace: float = 0.4,
         wspace: float = 0.4,
-        q: Optional[int] = None,
-        plt_size: Optional[Tuple[int, int]] = None,
-        plt_num: Optional[int] = None,
-        x: Optional[int] = None,
-        y: Optional[int] = None
+        q: int | None = None,
+        plt_size: tuple[int, int] | None = None,
+        plt_num: int | None = None,
+        x: int | None = None,
+        y: int | None = None,
     ) -> None:
         """
         self.yihuier_instance.data:数据集
@@ -183,33 +190,32 @@ class EDAModule:
 
         plt.figure(figsize=plt_size)
         plt.subplots_adjust(hspace=hspace, wspace=wspace)
-        for i, col in zip(range(1, plt_num + 1, 1), col_list):
-            bucket = pd.qcut(self.yihuier_instance.data[col], q=q, duplicates='drop')
+        for i, col in zip(range(1, plt_num + 1, 1), col_list, strict=True):
+            bucket = pd.qcut(self.yihuier_instance.data[col], q=q, duplicates="drop")
             d1 = self.yihuier_instance.data.groupby(bucket)
             d2 = pd.DataFrame()
-            d2['total'] = d1[self.yihuier_instance.target].count()
-            d2['bad'] = d1[self.yihuier_instance.target].sum()
-            d2['default_rate'] = d2['bad'] / d2['total']
+            d2["total"] = d1[self.yihuier_instance.target].count()
+            d2["bad"] = d1[self.yihuier_instance.target].sum()
+            d2["default_rate"] = d2["bad"] / d2["total"]
             d2 = d2.reset_index()
             plt.subplot(x, y, i)
-            plt.title(col, color='cornflowerblue')
+            plt.title(col, color="cornflowerblue")
             plt.axhline(y=all_default_rate)
-            sns.pointplot(data=d2, x=col, y='default_rate', color='cornflowerblue')
+            sns.pointplot(data=d2, x=col, y="default_rate", color="cornflowerblue")
             plt.xticks(rotation=60)
-            plt.xlabel('')
+            plt.xlabel("")
         return plt.show()
 
     # 使用ydata_profiling进行自动EDA，维度较高时，速度较慢
     def auto_eda_profiling(self) -> None:
         # 使用pandas profiling进行自动EDA
-        profile = ProfileReport(self.yihuier_instance.yihuier_instance.data,
-                                title="Report",
-                                correlations={"auto": {"calculate": False}},
-                                missing_diagrams={"Heatmap": False}
-                                )  # object created
-        profile.to_file(output_file='Data/output.html')
-
-
+        profile = ProfileReport(
+            self.yihuier_instance.yihuier_instance.data,
+            title="Report",
+            correlations={"auto": {"calculate": False}},
+            missing_diagrams={"Heatmap": False},
+        )  # object created
+        profile.to_file(output_file="Data/output.html")
 
     def __calculate_category_stats(self):
         category_stats = {}
@@ -219,9 +225,9 @@ class EDAModule:
             missing_pct = self.data[var].isnull().mean() * 100
 
             category_stats[var] = {
-                'unique_count': unique_count,
-                'entropy': entropy_val,
-                'missing_pct': missing_pct
+                "unique_count": unique_count,
+                "entropy": entropy_val,
+                "missing_pct": missing_pct,
             }
 
         return pd.DataFrame(category_stats).transpose()
@@ -238,13 +244,13 @@ class EDAModule:
             missing_pct = self.data[var].isnull().mean() * 100
 
             numeric_stats[var] = {
-                'mean': mean_val,
-                'min': min_val,
-                'q1': q1,
-                'median': median_val,
-                'q3': q3,
-                'max': max_val,
-                'missing_pct': missing_pct
+                "mean": mean_val,
+                "min": min_val,
+                "q1": q1,
+                "median": median_val,
+                "q3": q3,
+                "max": max_val,
+                "missing_pct": missing_pct,
             }
 
         return pd.DataFrame(numeric_stats).transpose()

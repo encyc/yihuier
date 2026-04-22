@@ -1,8 +1,7 @@
-from typing import Optional, List, Union
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
+
 
 class DataProcessingModule:
     def __init__(self, yihuier_instance) -> None:
@@ -19,13 +18,15 @@ class DataProcessingModule:
         """
         total = self.yihuier_instance.data.shape[0]
         missing_count = self.yihuier_instance.data.isnull().sum()
-        missing_pct = missing_count/total
-        missing_data = pd.DataFrame({
-            'index': self.yihuier_instance.data.columns.tolist(),
-            'total_obs': total,
-            'missing_count': missing_count,
-            'missing_pct': missing_pct
-        })
+        missing_pct = missing_count / total
+        missing_data = pd.DataFrame(
+            {
+                "index": self.yihuier_instance.data.columns.tolist(),
+                "total_obs": total,
+                "missing_count": missing_count,
+                "missing_pct": missing_pct,
+            }
+        )
         return missing_data
 
     def __missing_obs_cal(self):
@@ -35,58 +36,53 @@ class DataProcessingModule:
         total = len(self.yihuier_instance.data.columns)
         missing_count = self.yihuier_instance.data.isnull().sum(axis=1)
         missing_pct = missing_count / total
-        missing_data = pd.DataFrame({
-            'index': self.yihuier_instance.data.index.tolist(),
-            'total_obs': total,
-            'missing_count': missing_count,
-            'missing_pct': missing_pct
-        })
+        missing_data = pd.DataFrame(
+            {
+                "index": self.yihuier_instance.data.index.tolist(),
+                "total_obs": total,
+                "missing_count": missing_count,
+                "missing_pct": missing_pct,
+            }
+        )
         print(missing_data)
         return missing_data
 
-
-
     # 所有变量缺失值分布图
-    def plot_bar_missing_var(self, plt_size: Optional[tuple] = None) -> None:
+    def plot_bar_missing_var(self, plt_size: tuple | None = None) -> None:
         """
         plt_size: plot chart size: (10, 10)
 
         return: bar chart of missing variables
         """
         missing_data = self.__missing_var_cal()
-        print('plot_bar')
+        print("plot_bar")
         print(missing_data)
         if plt_size is not None:
             plt.figure(figsize=plt_size)
         else:
             plt.figure()
 
-        plt.rcParams['font.sans-serif'] = ['Microsoft YaHei']
-        plt.rcParams['axes.unicode_minus'] = False
+        plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
+        plt.rcParams["axes.unicode_minus"] = False
 
-        x = missing_data['index']
-        y = missing_data['missing_pct']
+        x = missing_data["index"]
+        y = missing_data["missing_pct"]
 
-        plt.bar(x, y, color='hotpink', edgecolor='k', alpha=0.8)
-        plt.title('各列缺失率')
-        plt.ylabel('缺失率')
-        plt.xlabel('列名')
+        plt.bar(x, y, color="hotpink", edgecolor="k", alpha=0.8)
+        plt.title("各列缺失率")
+        plt.ylabel("缺失率")
+        plt.xlabel("列名")
         plt.xticks(rotation=45)
 
         plt.show()
 
     # TODO:
-    #* 单个样本缺失值分布图
+    # * 单个样本缺失值分布图
     # def plot_bar_missing_obs(self):
-        
-
 
     # 缺失值填充（类别型变量）
     def fillna_cate_var(
-        self,
-        col_list: List[str],
-        fill_type: Optional[str] = None,
-        fill_str: Optional[str] = None
+        self, col_list: list[str], fill_type: str | None = None, fill_str: str | None = None
     ) -> pd.DataFrame:
         """
         data:数据集
@@ -97,9 +93,9 @@ class DataProcessingModule:
         """
         data2 = self.yihuier_instance.data.copy()
         for col in col_list:
-            if fill_type == 'class':
+            if fill_type == "class":
                 data2[col] = data2[col].fillna(fill_str)
-            if fill_type == 'mode':
+            if fill_type == "mode":
                 data2[col] = data2[col].fillna(data2[col].mode()[0])
         return data2
 
@@ -109,10 +105,10 @@ class DataProcessingModule:
     # 缺失率超过15%的变量建议当作一个类别
     def fillna_num_var(
         self,
-        col_list: List[str],
-        fill_type: Optional[str] = None,
-        fill_class_num: Optional[float] = None,
-        filled_data: Optional[pd.DataFrame] = None
+        col_list: list[str],
+        fill_type: str | None = None,
+        fill_class_num: float | None = None,
+        filled_data: pd.DataFrame | None = None,
     ) -> pd.DataFrame:
         """
         data:数据集
@@ -125,13 +121,13 @@ class DataProcessingModule:
         """
         data2 = self.yihuier_instance.data.copy()
         for col in col_list:
-            if fill_type == '0':
+            if fill_type == "0":
                 data2[col] = data2[col].fillna(0)
-            if fill_type == 'median':
+            if fill_type == "median":
                 data2[col] = data2[col].fillna(data2[col].median())
-            if fill_type == 'class':
+            if fill_type == "class":
                 data2[col] = data2[col].fillna(fill_class_num)
-            if fill_type == 'rf':
+            if fill_type == "rf":
                 rf_data = pd.concat([data2[col], filled_data], axis=1)
                 known = rf_data[rf_data[col].notnull()]
                 unknown = rf_data[rf_data[col].isnull()]
@@ -157,10 +153,10 @@ class DataProcessingModule:
         missing_col_num = missing_data[missing_data.missing_pct >= threshold].shape[0]
         missing_col = list(missing_data[missing_data.missing_pct >= threshold].index)
         data2 = data2.drop(missing_col, axis=1)
-        print('缺失率超过{}的变量个数为{}'.format(threshold, missing_col_num))
+        print(f"缺失率超过{threshold}的变量个数为{missing_col_num}")
         return data2
 
-    def delete_missing_obs(self, threshold: Union[float, int]) -> pd.DataFrame:
+    def delete_missing_obs(self, threshold: float | int) -> pd.DataFrame:
         """
         删除包含超过阈值数量的缺失值的 observation
 
@@ -176,11 +172,11 @@ class DataProcessingModule:
 
         # 找到缺失值数量超过阈值的 observation 的索引
         if threshold >= 1:
-            obs_to_remove = missing_data[missing_data['missing_count'] >= threshold].index
+            obs_to_remove = missing_data[missing_data["missing_count"] >= threshold].index
         else:
-            obs_to_remove = missing_data[missing_data['missing_pct'] >= threshold].index
+            obs_to_remove = missing_data[missing_data["missing_pct"] >= threshold].index
         data2 = data2.drop(obs_to_remove, axis=0)
-        print('含有超过{}个缺失值的样本数量为{}'.format(threshold, len(obs_to_remove)))
+        print(f"含有超过{threshold}个缺失值的样本数量为{len(obs_to_remove)}")
         return data2
 
     # 常变量/同值化处理
@@ -204,12 +200,12 @@ class DataProcessingModule:
         # 删除常变量/同值化处理后的数据集
         data_after_const_delete = self.yihuier_instance.data.drop(columns=const_columns)
 
-        print('删除常变量/同值化处理后的变量个数为{},名字为{}'.format(len(const_columns),const_columns))
+        print(f"删除常变量/同值化处理后的变量个数为{len(const_columns)},名字为{const_columns}")
         print(data_after_const_delete.shape[1])
         return data_after_const_delete
 
     # 缺失目标变量删除
-    def target_missing_delete(self) -> Optional[pd.DataFrame]:
+    def target_missing_delete(self) -> pd.DataFrame | None:
         """
         删除目标变量为空的观测
 
@@ -217,19 +213,19 @@ class DataProcessingModule:
         删除缺失目标变量后的数据集
         """
         if self.yihuier_instance.target is not None:
-            data_without_missing_target = self.yihuier_instance.data.dropna(subset=[self.yihuier_instance.target])
-            missing_target_count = len(self.yihuier_instance.data) - len(data_without_missing_target)
-            print('删除目标变量缺失的观测数: {}'.format(missing_target_count))
+            data_without_missing_target = self.yihuier_instance.data.dropna(
+                subset=[self.yihuier_instance.target]
+            )
+            missing_target_count = len(self.yihuier_instance.data) - len(
+                data_without_missing_target
+            )
+            print(f"删除目标变量缺失的观测数: {missing_target_count}")
             return data_without_missing_target
         else:
-            print('未指定目标变量，无法执行删除操作。')
+            print("未指定目标变量，无法执行删除操作。")
 
     # 日期变量转换为二进制变量
-    def date_var_shift_binary(
-        self,
-        col_list: List[str],
-        replace: bool = False
-    ) -> pd.DataFrame:
+    def date_var_shift_binary(self, col_list: list[str], replace: bool = False) -> pd.DataFrame:
         """
         将指定的日期型变量转换成二进制变量
 
@@ -243,8 +239,8 @@ class DataProcessingModule:
         data = self.yihuier_instance.data.copy()
         # 创建一个二进制变量，表示日期是否存在
         for col in col_list:
-            data[col + '_binary'] = 0
-            data.loc[~data[col].isnull(), col + '_binary'] = 1
+            data[col + "_binary"] = 0
+            data.loc[~data[col].isnull(), col + "_binary"] = 1
             if not replace:
                 # 如果需要保留原始日期变量，可以选择删除原始日期列
                 data.drop(columns=[col], inplace=True)

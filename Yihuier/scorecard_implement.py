@@ -1,26 +1,20 @@
-from typing import Optional, Tuple, Union
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.base import BaseEstimator
 
-
 # 评分卡实现
 
-class ScorecardImplementModule:
 
+class ScorecardImplementModule:
     def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
 
     # 评分卡刻度
     def cal_scale(
-        self,
-        score: float,
-        odds: float,
-        PDO: float,
-        model: BaseEstimator
-    ) -> Tuple[float, float, float]:
+        self, score: float, odds: float, PDO: float, model: BaseEstimator
+    ) -> tuple[float, float, float]:
         """
         odds：设定的坏好比
         score:在这个odds下的分数
@@ -32,18 +26,13 @@ class ScorecardImplementModule:
         B = 20 / (np.log(odds) - np.log(2 * odds))
         A = score - B * np.log(odds)
         base_score = A + B * model.intercept_[0]
-        print('B: {:.2f}'.format(B))
-        print('A: {:.2f}'.format(A))
-        print('基础分为：{:.2f}'.format(base_score))
+        print(f"B: {B:.2f}")
+        print(f"A: {A:.2f}")
+        print(f"基础分为：{base_score:.2f}")
         return A, B, base_score
 
     # 变量得分表
-    def score_df_concat(
-        self,
-        woe_df: pd.DataFrame,
-        model: BaseEstimator,
-        B: float
-    ) -> pd.DataFrame:
+    def score_df_concat(self, woe_df: pd.DataFrame, model: BaseEstimator, B: float) -> pd.DataFrame:
         """
         woe_df: woe结果表
         model:逻辑回归模型
@@ -53,22 +42,19 @@ class ScorecardImplementModule:
         coe = list(model.coef_[0])
         columns = list(woe_df.col.unique())
         scores = []
-        for c, col in zip(coe, columns):
+        for c, col in zip(coe, columns, strict=True):
             score = []
             for w in list(woe_df[woe_df.col == col].woe):
                 s = round(c * w * B, 0)
                 score.append(s)
             scores.extend(score)
-        woe_df['score'] = scores
+        woe_df["score"] = scores
         score_df = woe_df.copy()
         return score_df
 
     # 分数转换
     def score_transform(
-        self,
-        df: pd.DataFrame,
-        target: str,
-        df_score: pd.DataFrame
+        self, df: pd.DataFrame, target: str, df_score: pd.DataFrame
     ) -> pd.DataFrame:
         """
         df:数据集
@@ -83,26 +69,21 @@ class ScorecardImplementModule:
             bin_map = df_score[df_score.col == col]
             bin_res = np.array([0] * x.shape[0], dtype=float)
             for i in bin_map.index:
-                lower = bin_map['min_bin'][i]
-                upper = bin_map['max_bin'][i]
+                lower = bin_map["min_bin"][i]
+                upper = bin_map["max_bin"][i]
                 if lower == upper:
                     x1 = x[np.where(x == lower)[0]]
                 else:
                     x1 = x[np.where((x >= lower) & (x <= upper))[0]]
                 mask = np.in1d(x, x1)
-                bin_res[mask] = bin_map['score'][i]
+                bin_res[mask] = bin_map["score"][i]
             bin_res = pd.Series(bin_res, index=x.index)
             bin_res.name = x.name
             df2[col] = bin_res
         return df2
 
     # 得分的KS
-    def plot_score_ks(
-        self,
-        df: pd.DataFrame,
-        score_col: str,
-        target: str
-    ) -> None:
+    def plot_score_ks(self, df: pd.DataFrame, score_col: str, target: str) -> None:
         """
         df:数据集
         target:目标变量的字段名
@@ -112,7 +93,7 @@ class ScorecardImplementModule:
         total_good = df[target].count() - total_bad
         score_list = list(df[score_col])
         target_list = list(df[target])
-        items = sorted(zip(score_list, target_list), key=lambda x: x[0])
+        items = sorted(zip(score_list, target_list, strict=True), key=lambda x: x[0])
         step = (max(score_list) - min(score_list)) / 200
 
         score_bin = []
@@ -134,11 +115,11 @@ class ScorecardImplementModule:
 
         fig = plt.figure(figsize=(8, 6))
         ax = fig.add_subplot(1, 1, 1)
-        ax.plot(score_bin, good_rate, color='green', label='good_rate')
-        ax.plot(score_bin, bad_rate, color='red', label='bad_rate')
-        ax.plot(score_bin, ks_list, color='blue', label='good-bad')
-        ax.set_title('KS:{:.3f}'.format(max(ks_list)))
-        ax.legend(loc='best')
+        ax.plot(score_bin, good_rate, color="green", label="good_rate")
+        ax.plot(score_bin, bad_rate, color="red", label="bad_rate")
+        ax.plot(score_bin, ks_list, color="blue", label="good-bad")
+        ax.set_title(f"KS:{max(ks_list):.3f}")
+        ax.legend(loc="best")
         plt.show()
 
     # PR曲线
@@ -147,7 +128,7 @@ class ScorecardImplementModule:
         df: pd.DataFrame,
         score_col: str,
         target: str,
-        plt_size: Optional[Tuple[int, int]] = None
+        plt_size: tuple[int, int] | None = None,
     ) -> None:
         """
         df:得分的数据集
@@ -160,8 +141,8 @@ class ScorecardImplementModule:
         total_bad = df[target].sum()
         score_list = list(df[score_col])
         target_list = list(df[target])
-        score_unique_list = sorted(set(list(df[score_col])))
-        items = sorted(zip(score_list, target_list), key=lambda x: x[0])
+        score_unique_list = sorted(set(df[score_col]))
+        items = sorted(zip(score_list, target_list, strict=True), key=lambda x: x[0])
 
         precison_list = []
         tpr_list = []
@@ -175,11 +156,11 @@ class ScorecardImplementModule:
             tpr_list.append(tpr)
 
         plt.figure(figsize=plt_size)
-        plt.title('PR曲线')
-        plt.xlabel('查全率')
-        plt.ylabel('精确率')
-        plt.plot(tpr_list, precison_list, color='tomato', label='PR曲线')
-        plt.legend(loc='best')
+        plt.title("PR曲线")
+        plt.xlabel("查全率")
+        plt.ylabel("精确率")
+        plt.plot(tpr_list, precison_list, color="tomato", label="PR曲线")
+        plt.legend(loc="best")
         return plt.show()
 
     # 得分分布图
@@ -188,8 +169,8 @@ class ScorecardImplementModule:
         df: pd.DataFrame,
         target: str,
         score_col: str,
-        plt_size: Optional[Tuple[int, int]] = None,
-        cutoff: Optional[float] = None
+        plt_size: tuple[int, int] | None = None,
+        cutoff: float | None = None,
     ) -> None:
         """
         df:数据集
@@ -203,8 +184,8 @@ class ScorecardImplementModule:
         plt.figure(figsize=plt_size)
         x1 = df[df[target] == 1][score_col]
         x2 = df[df[target] == 0][score_col]
-        sns.kdeplot(x1, shade=True, label='坏用户', color='hotpink')
-        sns.kdeplot(x2, shade=True, label='好用户', color='seagreen')
+        sns.kdeplot(x1, shade=True, label="坏用户", color="hotpink")
+        sns.kdeplot(x2, shade=True, label="好用户", color="seagreen")
         if cutoff is not None:
             plt.axvline(x=cutoff)
         plt.legend()
@@ -216,9 +197,9 @@ class ScorecardImplementModule:
         df: pd.DataFrame,
         score_col: str,
         target: str,
-        x: Optional[float] = None,
-        y: Optional[float] = None,
-        step: Optional[float] = None
+        x: float | None = None,
+        y: float | None = None,
+        step: float | None = None,
     ) -> pd.DataFrame:
         """
         df:数据集
@@ -230,24 +211,24 @@ class ScorecardImplementModule:
 
         return :得分明细表
         """
-        df['score_bin'] = pd.cut(df[score_col], bins=np.arange(x, y, step), right=True)
+        df["score_bin"] = pd.cut(df[score_col], bins=np.arange(x, y, step), right=True)
         total = df[target].count()
         bad = df[target].sum()
         good = total - bad
 
-        group = df.groupby('score_bin')
+        group = df.groupby("score_bin")
         score_info_df = pd.DataFrame()
-        score_info_df['用户数'] = group[target].count()
-        score_info_df['坏用户'] = group[target].sum()
-        score_info_df['好用户'] = score_info_df['用户数'] - score_info_df['坏用户']
-        score_info_df['违约占比'] = score_info_df['坏用户'] / score_info_df['用户数']
-        score_info_df['累计用户'] = score_info_df['用户数'].cumsum()
-        score_info_df['坏用户累计'] = score_info_df['坏用户'].cumsum()
-        score_info_df['好用户累计'] = score_info_df['好用户'].cumsum()
-        score_info_df['坏用户累计占比'] = score_info_df['坏用户累计'] / bad
-        score_info_df['好用户累计占比'] = score_info_df['好用户累计'] / good
-        score_info_df['累计用户占比'] = score_info_df['累计用户'] / total
-        score_info_df['累计违约占比'] = score_info_df['坏用户累计'] / score_info_df['累计用户']
+        score_info_df["用户数"] = group[target].count()
+        score_info_df["坏用户"] = group[target].sum()
+        score_info_df["好用户"] = score_info_df["用户数"] - score_info_df["坏用户"]
+        score_info_df["违约占比"] = score_info_df["坏用户"] / score_info_df["用户数"]
+        score_info_df["累计用户"] = score_info_df["用户数"].cumsum()
+        score_info_df["坏用户累计"] = score_info_df["坏用户"].cumsum()
+        score_info_df["好用户累计"] = score_info_df["好用户"].cumsum()
+        score_info_df["坏用户累计占比"] = score_info_df["坏用户累计"] / bad
+        score_info_df["好用户累计占比"] = score_info_df["好用户累计"] / good
+        score_info_df["累计用户占比"] = score_info_df["累计用户"] / total
+        score_info_df["累计违约占比"] = score_info_df["坏用户累计"] / score_info_df["累计用户"]
         score_info_df = score_info_df.reset_index()
         return score_info_df
 
@@ -258,7 +239,7 @@ class ScorecardImplementModule:
         score_col: str,
         target: str,
         bins: int = 10,
-        plt_size: Optional[Tuple[int, int]] = None
+        plt_size: tuple[int, int] | None = None,
     ) -> None:
         """
         df:数据集，包含最终的得分
@@ -271,7 +252,7 @@ class ScorecardImplementModule:
         """
         score_list = list(df[score_col])
         label_list = list(df[target])
-        items = sorted(zip(score_list, label_list), key=lambda x: x[0])
+        items = sorted(zip(score_list, label_list, strict=True), key=lambda x: x[0])
         step = round(df.shape[0] / bins, 0)
         bad = df[target].sum()
         all_badrate = float(1 / bins)
@@ -303,27 +284,23 @@ class ScorecardImplementModule:
         y3 = bad_rate_cumsum
         y4 = all_badrate_cum
         plt.subplot(1, 2, 1)
-        plt.title('提升图')
+        plt.title("提升图")
         plt.xticks(np.arange(bins) + 0.15, x, rotation=90)
         bar_width = 0.3
-        plt.bar(np.arange(bins), y1, width=bar_width, color='hotpink', label='score_card')
-        plt.bar(np.arange(bins) + bar_width, y2, width=bar_width, color='seagreen', label='random')
-        plt.legend(loc='best')
+        plt.bar(np.arange(bins), y1, width=bar_width, color="hotpink", label="score_card")
+        plt.bar(np.arange(bins) + bar_width, y2, width=bar_width, color="seagreen", label="random")
+        plt.legend(loc="best")
         plt.subplot(1, 2, 2)
-        plt.title('洛伦兹曲线图')
-        plt.plot(y3, color='hotpink', label='score_card')
-        plt.plot(y4, color='seagreen', label='random')
+        plt.title("洛伦兹曲线图")
+        plt.plot(y3, color="hotpink", label="score_card")
+        plt.plot(y4, color="seagreen", label="random")
         plt.xticks(np.arange(bins + 1), rotation=0)
-        plt.legend(loc='best')
+        plt.legend(loc="best")
         return plt.show()
 
     # 设定cutoff点，衡量有效性
     def rule_verify(
-        self,
-        df: pd.DataFrame,
-        col_score: str,
-        target: str,
-        cutoff: float
+        self, df: pd.DataFrame, col_score: str, target: str, cutoff: float
     ) -> pd.DataFrame:
         """
         df:数据集
@@ -333,23 +310,27 @@ class ScorecardImplementModule:
 
         return :混淆矩阵
         """
-        df['result'] = df.apply(lambda x: 30 if x[col_score] <= cutoff else 10, axis=1)
-        TP = df[(df['result'] == 30) & (df[target] == 1)].shape[0]
-        FN = df[(df['result'] == 30) & (df[target] == 0)].shape[0]
+        df["result"] = df.apply(lambda x: 30 if x[col_score] <= cutoff else 10, axis=1)
+        TP = df[(df["result"] == 30) & (df[target] == 1)].shape[0]
+        FN = df[(df["result"] == 30) & (df[target] == 0)].shape[0]
         bad = df[df[target] == 1].shape[0]
         good = df[df[target] == 0].shape[0]
-        refuse = df[df['result'] == 30].shape[0]
-        passed = df[df['result'] == 10].shape[0]
+        refuse = df[df["result"] == 30].shape[0]
 
         acc = round(TP / refuse, 3)
         tpr = round(TP / bad, 3)
         fpr = round(FN / good, 3)
         pass_rate = round(refuse / df.shape[0], 3)
-        matrix_df = pd.pivot_table(df, index='result', columns=target, aggfunc={col_score: pd.Series.count},
-                                   values=col_score)
+        matrix_df = pd.pivot_table(
+            df,
+            index="result",
+            columns=target,
+            aggfunc={col_score: pd.Series.count},
+            values=col_score,
+        )
 
-        print('精确率:{}'.format(acc))
-        print('查全率:{}'.format(tpr))
-        print('误伤率:{}'.format(fpr))
-        print('规则拒绝率:{}'.format(pass_rate))
+        print(f"精确率:{acc}")
+        print(f"查全率:{tpr}")
+        print(f"误伤率:{fpr}")
+        print(f"规则拒绝率:{pass_rate}")
         return matrix_df

@@ -1,14 +1,16 @@
 # 示例
 if __name__ == "__main__":
-    from yihuier.yihuier import Yihuier
     import warnings
+
     import pandas as pd
 
-    # ban FutureWarning
-    warnings.filterwarnings('ignore')
+    from yihuier.yihuier import Yihuier
 
+    # ban FutureWarning
+    warnings.filterwarnings("ignore")
 
     import os
+
     dir = "Data/talkingdata/TD测试结果_广州智租"
 
     filename = os.listdir(dir)
@@ -18,12 +20,12 @@ if __name__ == "__main__":
     for i in filename:
         print(i)
         try:
-            with open(f"{dir}/{i}", "r") as f:
+            with open(f"{dir}/{i}") as f:
                 data = pd.read_csv(f)
             print(data.head())
 
             df = data.copy()
-            yi = Yihuier(df, 'dlq')
+            yi = Yihuier(df, "dlq")
             result = yi.pipeline_module.product_test()
             result.to_csv(f"{dir}/result/{i}")
         except Exception as e:

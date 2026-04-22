@@ -4,11 +4,12 @@ class Yihuier:
         self.target = target
         self.eda_module = EDAModule(self)
         self.dp_module = DataProcessingModule(self)
-        self.cluster_module = ClusterMuodule(self)
+        self.cluster_module = ClusterModule(self)
         self.binning_module = BinningModule(self)
         self.var_select_module = VarSelectModule(self)
         self.me_module = ModelEvaluationModule(self)
         self.si_module = ScorecardImplementModule(self)
+
 
 class EDAModule:
     def __init__(self, yihuier_instance):
@@ -25,7 +26,6 @@ class DataProcessingModule:
 
 
 class BinningModule:
-
     def __init__(self, yihuier_instance):
         self.yihuier_instance = yihuier_instance
         self.bin_df = None
@@ -37,7 +37,6 @@ class BinningModule:
 
 
 class VarSelectModule:
-
     def __init__(self, yihuier_instance):
         self.yihuier_instance = yihuier_instance
         self.xg_fea_imp = None
@@ -46,8 +45,17 @@ class VarSelectModule:
 
 
 class ModelEvaluationModule:
-
     def __init__(self, yihuier_instance):
         self.yihuier_instance = yihuier_instance
         self.y_label = None
         self.y_pred = None
+
+
+class ScorecardImplementModule:
+    def __init__(self, yihuier_instance):
+        self.yihuier_instance = yihuier_instance
+
+
+class ClusterModule:
+    def __init__(self, yihuier_instance):
+        self.yihuier_instance = yihuier_instance

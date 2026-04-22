@@ -1,15 +1,14 @@
-from typing import Optional, List, Union
-from yihuier.binning import BinningModule
-from yihuier.eda import EDAModule
-from yihuier.data_processing import DataProcessingModule
-from yihuier.cluster import ClusterModule
-from yihuier.var_select import VarSelectModule
-from yihuier.model_evaluation import ModelEvaluationModule
-from yihuier.scorecard_implement import ScorecardImplementModule
-from yihuier.pipeline import PipelineModule
-
 import numpy as np
 import pandas as pd
+
+from yihuier.binning import BinningModule
+from yihuier.cluster import ClusterModule
+from yihuier.data_processing import DataProcessingModule
+from yihuier.eda import EDAModule
+from yihuier.model_evaluation import ModelEvaluationModule
+from yihuier.pipeline import PipelineModule
+from yihuier.scorecard_implement import ScorecardImplementModule
+from yihuier.var_select import VarSelectModule
 
 
 class Yihuier:
@@ -35,7 +34,7 @@ class Yihuier:
         pipeline_module: 流水线模块
     """
 
-    def __init__(self, data: pd.DataFrame, target: Optional[str] = None) -> None:
+    def __init__(self, data: pd.DataFrame, target: str | None = None) -> None:
         """初始化 Yihuier 实例
 
         Args:
@@ -43,7 +42,7 @@ class Yihuier:
             target: 目标变量列名
         """
         self.data: pd.DataFrame = data
-        self.target: Optional[str] = target
+        self.target: str | None = target
         self.eda_module: EDAModule = EDAModule(self)
         self.dp_module: DataProcessingModule = DataProcessingModule(self)
         self.cluster_module: ClusterModule = ClusterModule(self)
@@ -53,19 +52,19 @@ class Yihuier:
         self.si_module: ScorecardImplementModule = ScorecardImplementModule(self)
         self.pipeline_module: PipelineModule = PipelineModule(self)
 
-    def get_categorical_variables(self) -> List[str]:
+    def get_categorical_variables(self) -> list[str]:
         """提取字符型/类别型变量的名字并返回列表
 
         Returns:
             类别型变量名称列表
         """
-        cate_vars = self.data.select_dtypes(include=['object', 'category']).columns.tolist()
+        cate_vars = self.data.select_dtypes(include=["object", "category"]).columns.tolist()
 
         if self.target in cate_vars:
             cate_vars.remove(self.target)
         return cate_vars
 
-    def get_numeric_variables(self) -> List[str]:
+    def get_numeric_variables(self) -> list[str]:
         """提取数值型变量的名字并返回列表
 
         Returns:
@@ -81,7 +80,7 @@ class Yihuier:
             num_vars.remove(self.target)
         return num_vars
 
-    def get_date_variables(self) -> List[str]:
+    def get_date_variables(self) -> list[str]:
         """提取日期型变量的名字并返回列表
 
         Returns:
@@ -107,12 +106,12 @@ class Yihuier:
         if self.data[col].dropna().empty:
             return False
 
-        date_formats = ['%Y%m%d', '%Y%m', '%m%d', '%Y%m%d%H%M%S', '%Y-%m-%d', '%Y-%m', '%m-%d']
+        date_formats = ["%Y%m%d", "%Y%m", "%m%d", "%Y%m%d%H%M%S", "%Y-%m-%d", "%Y-%m", "%m-%d"]
 
         for date_format in date_formats:
             try:
                 # 尝试转换为日期
-                pd.to_datetime(self.data[col], format=date_format, errors='raise')
+                pd.to_datetime(self.data[col], format=date_format, errors="raise")
                 return True
             except (ValueError, TypeError):
                 continue

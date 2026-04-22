@@ -1,15 +1,10 @@
-from typing import Optional, Tuple
 import matplotlib.pyplot as plt
-
 import numpy as np
 import pandas as pd
-import seaborn as sns
-
 
 
 # 评分卡实现
 class ScorecardMonitorModule:
-
     def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
 
@@ -19,7 +14,7 @@ class ScorecardMonitorModule:
         df: pd.DataFrame,
         day_col: str,
         score_col: str,
-        plt_size: Optional[Tuple[int, int]] = None
+        plt_size: tuple[int, int] | None = None,
     ) -> None:
         """
         df:变量在一段时间内，每个区间上的得分
@@ -29,15 +24,17 @@ class ScorecardMonitorModule:
 
         return:变量区间得分的偏移图
         """
-        day_list = sorted(set(list(df[day_col])))
-        score_list = sorted(set(list(df[score_col])))
+        day_list = sorted(set(df[day_col]))
+        score_list = sorted(set(df[score_col]))
         # 计算每天各个区间得分的占比
         prop_day_list = []
         for day in day_list:
             prop_list = []
             for score in score_list:
-                prop = df[(df[day_col] == day) & (df[score_col] == score)].shape[0] / df[df[day_col] == day].shape[
-                    0]
+                prop = (
+                    df[(df[day_col] == day) & (df[score_col] == score)].shape[0]
+                    / df[df[day_col] == day].shape[0]
+                )
                 prop_list.append(prop)
             prop_day_list.append(prop_list)
 
@@ -78,24 +75,24 @@ class ScorecardMonitorModule:
         fig = plt.figure(figsize=plt_size)
         ax1 = fig.add_subplot(1, 1, 1)
         # 先清除x轴的刻度
-        ax1.xaxis.set_major_formatter(plt.FuncFormatter(''.format))
+        ax1.xaxis.set_major_formatter(plt.FuncFormatter("".format))
         ax1.set_xticks(range(1, len(day_list) * 2, 2))
 
         # 将y轴的刻度设置为百分比形式
         def to_percent(temp, position):
-            return '%1.0f' % (100 * temp) + '%'
+            return "%1.0f" % (100 * temp) + "%"
 
         plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(to_percent))
         # 自定义x轴刻度标签
-        for a, b in zip(x_bar, day_list):
-            ax1.text(a, -0.08, b, ha='center', va='bottom')
+        for a, b in zip(x_bar, day_list, strict=True):
+            ax1.text(a, -0.08, b, ha="center", va="bottom")
         # 绘制面积图和堆积柱状图
-        for i, s in zip(range(len(day_list)), score_list):
+        for i, s in zip(range(len(day_list)), score_list, strict=True):
             ax1.stackplot(x_stack, stack_prop_list[i], alpha=0.25)
-            ax1.bar(x_bar, bar_prop_list[i], width=1, label='得分:{}'.format(s))
+            ax1.bar(x_bar, bar_prop_list[i], width=1, label=f"得分:{s}")
             # 添加y轴刻度虚线
-            ax1.grid(True, 'major', 'y', ls='--', lw=.5, c='black', alpha=.3)
-            ax1.legend(loc='best')
+            ax1.grid(True, "major", "y", ls="--", lw=0.5, c="black", alpha=0.3)
+            ax1.legend(loc="best")
         plt.show()
 
     # 计算评分的PSI
@@ -107,7 +104,7 @@ class ScorecardMonitorModule:
         score_col: str,
         x: float,
         y: float,
-        step: Optional[float] = None
+        step: float | None = None,
     ) -> pd.DataFrame:
         """
         df1:建模样本的得分,包含用户id,得分
@@ -120,34 +117,42 @@ class ScorecardMonitorModule:
 
         return: 得分psi表
         """
-        df1['score_bin'] = pd.cut(df1[score_col], bins=np.arange(x, y, step))
-        model_score_group = df1.groupby('score_bin', as_index=False)[id_col].count().assign(
-            pct=lambda x: x[id_col] / x[id_col].sum()).rename(columns={id_col: '建模样本户数',
-                                                                       'pct': '建模户数占比'})
-        df2['score_bin'] = pd.cut(df2[score_col], bins=np.arange(x, y, step))
-        online_score_group = df2.groupby('score_bin', as_index=False)[id_col].count().assign(
-            pct=lambda x: x[id_col] / x[id_col].sum()).rename(columns={id_col: '线上样本户数',
-                                                                       'pct': '线上户数占比'})
-        score_compare = pd.merge(model_score_group, online_score_group, on='score_bin', how='inner')
-        score_compare['占比差异'] = score_compare['线上户数占比'] - score_compare['建模户数占比']
-        score_compare['占比权重'] = np.log(score_compare['线上户数占比'] / score_compare['建模户数占比'])
-        score_compare['Index'] = score_compare['占比差异'] * score_compare['占比权重']
-        score_compare['PSI'] = score_compare['Index'].sum()
+        df1["score_bin"] = pd.cut(df1[score_col], bins=np.arange(x, y, step))
+        model_score_group = (
+            df1.groupby("score_bin", as_index=False)[id_col]
+            .count()
+            .assign(pct=lambda x: x[id_col] / x[id_col].sum())
+            .rename(columns={id_col: "建模样本户数", "pct": "建模户数占比"})
+        )
+        df2["score_bin"] = pd.cut(df2[score_col], bins=np.arange(x, y, step))
+        online_score_group = (
+            df2.groupby("score_bin", as_index=False)[id_col]
+            .count()
+            .assign(pct=lambda x: x[id_col] / x[id_col].sum())
+            .rename(columns={id_col: "线上样本户数", "pct": "线上户数占比"})
+        )
+        score_compare = pd.merge(model_score_group, online_score_group, on="score_bin", how="inner")
+        score_compare["占比差异"] = score_compare["线上户数占比"] - score_compare["建模户数占比"]
+        score_compare["占比权重"] = np.log(
+            score_compare["线上户数占比"] / score_compare["建模户数占比"]
+        )
+        score_compare["Index"] = score_compare["占比差异"] * score_compare["占比权重"]
+        score_compare["PSI"] = score_compare["Index"].sum()
         return score_compare
 
     # 评分比较分布图
-    def plot_score_compare(self, df: pd.DataFrame, plt_size: Optional[Tuple[int, int]] = None) -> None:
-        fig = plt.figure(figsize=plt_size)
+    def plot_score_compare(self, df: pd.DataFrame, plt_size: tuple[int, int] | None = None) -> None:
+        plt.figure(figsize=plt_size)
         x = df.score_bin
         y1 = df.建模户数占比
         y2 = df.线上户数占比
         width = 0.3
-        plt.title('评分分布对比图')
-        plt.xlabel('得分区间')
-        plt.ylabel('用户占比')
+        plt.title("评分分布对比图")
+        plt.xlabel("得分区间")
+        plt.ylabel("用户占比")
         plt.xticks(np.arange(len(x)) + 0.15, x)
-        plt.bar(np.arange(len(y1)), y1, width=width, color='seagreen', label='建模样本')
-        plt.bar(np.arange(len(y2)) + width, y2, width=width, color='hotpink', label='上线样本')
+        plt.bar(np.arange(len(y1)), y1, width=width, color="seagreen", label="建模样本")
+        plt.bar(np.arange(len(y2)) + width, y2, width=width, color="hotpink", label="上线样本")
         plt.legend()
         return plt.show()
 
@@ -159,7 +164,7 @@ class ScorecardMonitorModule:
         var: str,
         id_col: str,
         score_col: str,
-        bins: list
+        bins: list,
     ) -> pd.DataFrame:
         """
         score_result:评分卡的score明细表，包含区间，用户数，用户占比,得分
@@ -171,19 +176,26 @@ class ScorecardMonitorModule:
 
         return :变量的稳定性分析表
         """
-        model_var_group = score_result.loc[
-            score_result.col == var, ['bin', 'total', 'totalrate', 'score']].reset_index(
-            drop=True).rename(columns={'total': '建模用户数',
-                                       'totalrate': '建模用户占比',
-                                       'score': '得分'})
-        df['bin'] = pd.cut(df[score_col], bins=bins)
-        online_var_group = df.groupby('bin', as_index=False)[id_col].count().assign(
-            pct=lambda x: x[id_col] / x[id_col].sum()).rename(columns={id_col: '线上用户数',
-                                                                       'pct': '线上用户占比'})
-        var_stable_df = pd.merge(model_var_group, online_var_group, on='bin', how='inner')
+        model_var_group = (
+            score_result.loc[score_result.col == var, ["bin", "total", "totalrate", "score"]]
+            .reset_index(drop=True)
+            .rename(columns={"total": "建模用户数", "totalrate": "建模用户占比", "score": "得分"})
+        )
+        df["bin"] = pd.cut(df[score_col], bins=bins)
+        online_var_group = (
+            df.groupby("bin", as_index=False)[id_col]
+            .count()
+            .assign(pct=lambda x: x[id_col] / x[id_col].sum())
+            .rename(columns={id_col: "线上用户数", "pct": "线上用户占比"})
+        )
+        var_stable_df = pd.merge(model_var_group, online_var_group, on="bin", how="inner")
         var_stable_df = var_stable_df.iloc[:, [0, 3, 1, 2, 4, 5]]
-        var_stable_df['得分'] = var_stable_df['得分'].astype('int64')
-        var_stable_df['建模样本权重'] = np.abs(var_stable_df['得分'] * var_stable_df['建模用户占比'])
-        var_stable_df['线上样本权重'] = np.abs(var_stable_df['得分'] * var_stable_df['线上用户占比'])
-        var_stable_df['权重差距'] = var_stable_df['线上样本权重'] - var_stable_df['建模样本权重']
+        var_stable_df["得分"] = var_stable_df["得分"].astype("int64")
+        var_stable_df["建模样本权重"] = np.abs(
+            var_stable_df["得分"] * var_stable_df["建模用户占比"]
+        )
+        var_stable_df["线上样本权重"] = np.abs(
+            var_stable_df["得分"] * var_stable_df["线上用户占比"]
+        )
+        var_stable_df["权重差距"] = var_stable_df["线上样本权重"] - var_stable_df["建模样本权重"]
         return var_stable_df

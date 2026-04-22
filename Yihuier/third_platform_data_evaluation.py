@@ -1,17 +1,18 @@
 # 在 main.py 或者 __init__.py 中创建主类 Yihui
 import warnings
+
 import pandas as pd
-import numpy as np
-from yihuier.yihuier import Yihuier
+
 from yihuier.constants import MISSING_VALUE_NEG_999
+from yihuier.yihuier import Yihuier
 
 # 在主程序中使用 Yihui 类
 if __name__ == "__main__":
     # ban FutureWarning
-    warnings.filterwarnings('ignore')
+    warnings.filterwarnings("ignore")
 
     # generate data.csv
-    with open("Data/data_yinlian.csv", "r") as f:
+    with open("Data/data_yinlian.csv") as f:
         # with open("Data/yunyinshang.csv", "r") as f:
         data = pd.read_csv(f)
 
@@ -20,7 +21,7 @@ if __name__ == "__main__":
     #     ['Unnamed: 0', 'APPLY_SERIAL_NO', 'apply_time', 'CUSTOMER_ID', 'CERT_ID', 'PHONE_NUMBER', 'CUSTOMER_NAME'],
     #     axis=1)
 
-    yi = Yihuier(df, 'dlq')
+    yi = Yihuier(df, "dlq")
 
     print("Categorical Variables:", yi.get_categorical_variables())
     print("Numeric Variables:", yi.get_numeric_variables())
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     print(yi.get_numeric_variables())
 
     print(yi.get_categorical_variables())
-    yi.dp_module.fillna_cate_var(yi.get_categorical_variables(), 'class', 'unkonwn')
+    yi.dp_module.fillna_cate_var(yi.get_categorical_variables(), "class", "unkonwn")
     #     # yi.eda_module.plot_default_cate(yi.get_categorical_variables(),plt_size=(100,100),plt_num=3,x=3,y=1)
     #
     #     yi.data = yi.data.drop(yi.get_categorical_variables(),axis = 1)
@@ -44,10 +45,11 @@ if __name__ == "__main__":
     #     #     else:
     #     #         l.append(i)
     #
-    yi.data = yi.dp_module.fillna_num_var(yi.get_numeric_variables(), fill_type='class', fill_class_num=MISSING_VALUE_NEG_999)
+    yi.data = yi.dp_module.fillna_num_var(
+        yi.get_numeric_variables(), fill_type="class", fill_class_num=MISSING_VALUE_NEG_999
+    )
     yi.data = yi.dp_module.delete_missing_var(threshold=0.01)
     # yi.dp_module.plot_bar_missing_var()
-
 
     # iv_list = []
     # col_list = []
@@ -80,10 +82,10 @@ if __name__ == "__main__":
 
     # twice = yi.var_select_module.forward_delete_corr_ivfirst(yi.get_numeric_variables(),threshold=0.3)
     # print(twice)
-    yi.bin_df = yi.binning_module.binning_num(yi.get_numeric_variables(),10, 0,method='freq')
+    yi.bin_df = yi.binning_module.binning_num(yi.get_numeric_variables(), 10, 0, method="freq")
     yi.binning_module.woe_df_concat()
     print(yi.binning_module.woe_result_df)
 
-    print('sir, this way')
+    print("sir, this way")
     yi.binning_module.woe_transform()
     print(yi.binning_module.data_woe)

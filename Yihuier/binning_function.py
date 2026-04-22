@@ -1,14 +1,15 @@
 import math
+
 import numpy as np
 import pandas as pd
-from scipy.stats import chi2
-from scipy.stats import spearmanr
+from scipy.stats import chi2, spearmanr
+
 from yihuier.constants import SPLIT_POINT_NOT_FOUND, SPLIT_POINT_NOT_FOUND_ALT
 
 
 # 01 计算IV
 def iv_count(data, var, target, weight):
-    """ 计算iv值
+    """计算iv值
     Args:
         data: DataFrame，拟操作的数据集
         var: String，拟计算IV值的变量名称
@@ -17,7 +18,7 @@ def iv_count(data, var, target, weight):
         IV值， float
     """
     # 获取变量的唯一值
-    value_list = set(list(np.unique(data[var])))
+    value_list = set(np.unique(data[var]))
     iv = 0
     # 计算每个唯一值的错误率
     data_bad = pd.Series(data[data[target] == 1][var].values, index=data[data[target] == 1].index)
@@ -42,12 +43,11 @@ def iv_count(data, var, target, weight):
     return iv
 
 
-
 # 02 基于CART算法的最优分箱代码实现
 
 
 def get_var_median(data, var):
-    """ 得到指定连续变量的所有元素的中位数列表
+    """得到指定连续变量的所有元素的中位数列表
     Args:
         data: DataFrame，拟操作的数据集
         var: String，拟分箱的连续型变量名称
@@ -63,7 +63,7 @@ def get_var_median(data, var):
 
 
 def calculate_gini(y):
-    """ 计算基尼指数
+    """计算基尼指数
     Args:
         y: Array，待计算数据的target，即0和1的数组
     Returns:
@@ -77,7 +77,7 @@ def calculate_gini(y):
 
 
 def get_cart_split_point(data, var, target, min_sample):
-    """ 获得最优的二值划分点（即基尼指数下降最大的点）
+    """获得最优的二值划分点（即基尼指数下降最大的点）
     Args:
         data: DataFrame，拟操作的数据集
         var: String，拟分箱的连续型变量名称
@@ -127,7 +127,7 @@ def get_cart_split_point(data, var, target, min_sample):
 
 
 def get_cart_bincut(data, var, target, leaf_stop_percent=0.05):
-    """ 计算最优分箱切分点
+    """计算最优分箱切分点
     Args:
         data: DataFrame，拟操作的数据集
         var: String，拟分箱的连续型变量名称
@@ -182,14 +182,14 @@ def get_cart_bincut(data, var, target, leaf_stop_percent=0.05):
 
 
 def calculate_chi(freq_array):
-    """ 计算卡方值
+    """计算卡方值
     Args:
         freq_array: Array，待计算卡方值的二维数组，频数统计结果
     Returns:
         卡方值，float
     """
     # 检查是否为二维数组
-    assert (freq_array.ndim == 2)
+    assert freq_array.ndim == 2
 
     # 计算每列的频数之和
     col_nums = freq_array.sum(axis=0)
@@ -209,7 +209,7 @@ def calculate_chi(freq_array):
 
 
 def get_chimerge_bincut(data, var, target, max_group=None, chi_threshold=None):
-    """ 计算卡方分箱的最优分箱点
+    """计算卡方分箱的最优分箱点
     Args:
         data: DataFrame，待计算卡方分箱最优切分点列表的数据集
         var: 待计算的连续型变量名称
@@ -221,14 +221,14 @@ def get_chimerge_bincut(data, var, target, max_group=None, chi_threshold=None):
         最优切分点列表，List
     """
 
-    '''
-    如果不知道卡方阈值怎么取，可以生成卡方表来看看，代码如下：  
+    """
+    如果不知道卡方阈值怎么取，可以生成卡方表来看看，代码如下：
     import pandas as pd
     import numpy as np
     from scipy.stats import chi2
     p = [0.995, 0.99, 0.975, 0.95, 0.9, 0.5, 0.1, 0.05, 0.025, 0.01, 0.005]
     pd.DataFrame(np.array([chi2.isf(p, df=i) for i in range(1,10)]), columns=p, index=list(range(1,10)))
-    '''
+    """
 
     freq_df = pd.crosstab(index=data[var], columns=data[target])
     # 转化为二维数组
@@ -248,7 +248,7 @@ def get_chimerge_bincut(data, var, target, max_group=None, chi_threshold=None):
         min_idx = None
         for i in range(len(freq_array) - 1):
             # 两两计算相邻两组的卡方值，得到最小卡方值的两组
-            v = calculate_chi(freq_array[i: i + 2])
+            v = calculate_chi(freq_array[i : i + 2])
             if min_chi is None or min_chi > v:
                 min_chi = v
                 min_idx = i
@@ -257,7 +257,8 @@ def get_chimerge_bincut(data, var, target, max_group=None, chi_threshold=None):
         # 条件1：当前箱体数仍大于 最大分箱数量阈值
         # 条件2：当前最小卡方值仍小于制定卡方阈值
         if (max_group is not None and max_group < len(freq_array)) or (
-                chi_threshold is not None and min_chi < chi_threshold):
+            chi_threshold is not None and min_chi < chi_threshold
+        ):
             tmp = freq_array[min_idx] + freq_array[min_idx + 1]
             freq_array[min_idx] = tmp
             freq_array = np.delete(freq_array, min_idx + 1, 0)
@@ -280,11 +281,11 @@ def get_chimerge_bincut(data, var, target, max_group=None, chi_threshold=None):
     return best_bincut
 
 
-
 # 04 基于最优KS的最优分箱代码实现
 
+
 def get_maxks_split_point(data, var, target, min_sample=0.05):
-    """ 计算KS值
+    """计算KS值
     Args:
         data: DataFrame，待计算卡方分箱最优切分点列表的数据集
         var: 待计算的连续型变量名称
@@ -301,7 +302,9 @@ def get_maxks_split_point(data, var, target, min_sample=0.05):
         # 计算每个组的卡方分箱点
         freq_df = pd.crosstab(index=data[var], columns=data[target])
         freq_array = freq_df.values
-        if freq_array.shape[1] == 1:  # 如果某一组只有一个枚举值，如0或1，则数组形状会有问题，跳出本次计算
+        if (
+            freq_array.shape[1] == 1
+        ):  # 如果某一组只有一个枚举值，如0或1，则数组形状会有问题，跳出本次计算
             # tt = np.zeros(freq_array.shape).T
             # freq_array = np.insert(freq_array, 0, values=tt, axis=1)
             ks_v, BestSplit_Point, BestSplit_Position = 0, SPLIT_POINT_NOT_FOUND, 0.0
@@ -317,7 +320,7 @@ def get_maxks_split_point(data, var, target, min_sample=0.05):
 
 
 def get_bestks_bincut(data, var, target, leaf_stop_percent=0.05):
-    """ 计算最优分箱切分点
+    """计算最优分箱切分点
     Args:
         data: DataFrame，拟操作的数据集
         var: String，拟分箱的连续型变量名称
@@ -368,35 +371,32 @@ def get_bestks_bincut(data, var, target, leaf_stop_percent=0.05):
     return best_bincut
 
 
-
-
-
 # 等频分箱
 def bin_frequency(x, y, n):
     total = y.count()
     bad = y.sum()
     good = total - bad
-    d1 = pd.DataFrame({"x": x, "y": y, 'bin': pd.qcut(x, n, duplicates='drop')})
-    d2 = d1.groupby('bin', as_index=True)
+    d1 = pd.DataFrame({"x": x, "y": y, "bin": pd.qcut(x, n, duplicates="drop")})
+    d2 = d1.groupby("bin", as_index=True)
     d3 = pd.DataFrame()
-    d3['total'] = d2.y.count()  ##每个箱中的总样本数
-    d3['bad'] = d2.y.sum()  ##每个箱中的坏样本数
-    d3['good'] = d3['total'] - d3['bad']  ##每个箱中的好样本数
-    d3['bad_rate'] = d3['bad'] / d3['total'] * 100  ##每个箱中的坏样本率
-    d3['%bad'] = d3['bad'] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
-    d3['%good'] = d3['good'] / good * 100  ##每个箱中的好样本占总好样本的比重
-    d3['%cum_bad'] = d3['%bad'].cumsum()
-    d3['%cum_good'] = d3['%good'].cumsum()
-    d3['woe'] = np.log(d3['%bad'] / d3['%good'])
-    d3['bin_iv'] = (d3['%bad'] - d3['%good']) * d3['woe']
-    d3['iv'] = d3['bin_iv'].sum()
-    d3['bin_ks'] = d3['%cum_bad'] - d3['%cum_good']
-    d3['ks'] = d3['bin_ks'].max()
+    d3["total"] = d2.y.count()  ##每个箱中的总样本数
+    d3["bad"] = d2.y.sum()  ##每个箱中的坏样本数
+    d3["good"] = d3["total"] - d3["bad"]  ##每个箱中的好样本数
+    d3["bad_rate"] = d3["bad"] / d3["total"] * 100  ##每个箱中的坏样本率
+    d3["%bad"] = d3["bad"] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
+    d3["%good"] = d3["good"] / good * 100  ##每个箱中的好样本占总好样本的比重
+    d3["%cum_bad"] = d3["%bad"].cumsum()
+    d3["%cum_good"] = d3["%good"].cumsum()
+    d3["woe"] = np.log(d3["%bad"] / d3["%good"])
+    d3["bin_iv"] = (d3["%bad"] - d3["%good"]) * d3["woe"]
+    d3["iv"] = d3["bin_iv"].sum()
+    d3["bin_ks"] = d3["%cum_bad"] - d3["%cum_good"]
+    d3["ks"] = d3["bin_ks"].max()
     d3.reset_index(inplace=True)
     return d3
 
 
-'''
+"""
     total = df[target].count()
     bad = df[target].sum()
     good = total-bad
@@ -438,7 +438,7 @@ def bin_frequency(x, y, n):
     bin_df.append(d2)
     iv_value.append(iv)
     d2.reset_index(inplace=True)
-'''
+"""
 
 
 # 等距分箱
@@ -446,22 +446,22 @@ def bin_distance(x, y, n=10):  ##主要woe有可能为-inf
     total = y.count()
     bad = y.sum()
     good = total - bad
-    d1 = pd.DataFrame({"x": x, "y": y, 'bin': pd.cut(x, n)})  ##等距分箱
-    d2 = d1.groupby('bin', as_index=True)
+    d1 = pd.DataFrame({"x": x, "y": y, "bin": pd.cut(x, n)})  ##等距分箱
+    d2 = d1.groupby("bin", as_index=True)
     d3 = pd.DataFrame()
-    d3['total'] = d2.y.count()  ##每个箱中的总样本数
-    d3['bad'] = d2.y.sum()  ##每个箱中的坏样本数
-    d3['good'] = d3['total'] - d3['bad']  ##每个箱中的好样本数
-    d3['bad_rate'] = d3['bad'] / d3['total'] * 100  ##每个箱中的坏样本率
-    d3['%bad'] = d3['bad'] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
-    d3['%good'] = d3['good'] / good * 100  ##每个箱中的好样本占总好样本的比重
-    d3['%cum_bad'] = d3['%bad'].cumsum()
-    d3['%cum_good'] = d3['%good'].cumsum()
-    d3['woe'] = np.log(d3['%bad'] / d3['%good'])
-    d3['bin_iv'] = (d3['%bad'] - d3['%good']) * d3['woe']
-    d3['iv'] = d3['bin_iv'].sum()
-    d3['bin_ks'] = d3['%cum_bad'] - d3['%cum_good']
-    d3['ks'] = d3['bin_ks'].max()
+    d3["total"] = d2.y.count()  ##每个箱中的总样本数
+    d3["bad"] = d2.y.sum()  ##每个箱中的坏样本数
+    d3["good"] = d3["total"] - d3["bad"]  ##每个箱中的好样本数
+    d3["bad_rate"] = d3["bad"] / d3["total"] * 100  ##每个箱中的坏样本率
+    d3["%bad"] = d3["bad"] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
+    d3["%good"] = d3["good"] / good * 100  ##每个箱中的好样本占总好样本的比重
+    d3["%cum_bad"] = d3["%bad"].cumsum()
+    d3["%cum_good"] = d3["%good"].cumsum()
+    d3["woe"] = np.log(d3["%bad"] / d3["%good"])
+    d3["bin_iv"] = (d3["%bad"] - d3["%good"]) * d3["woe"]
+    d3["iv"] = d3["bin_iv"].sum()
+    d3["bin_ks"] = d3["%cum_bad"] - d3["%cum_good"]
+    d3["ks"] = d3["bin_ks"].max()
     d3.reset_index(inplace=True)
     return d3
 
@@ -470,10 +470,8 @@ def bin_distance(x, y, n=10):  ##主要woe有可能为-inf
 def mono_bin(x, y, n=20):
     r = 0
     while np.abs(r) < 1:
-        d1 = pd.DataFrame({'x': x,
-                           'y': y,
-                           'bin': pd.qcut(x, n)})
-        d2 = d1.groupby('bin', as_index=True)
+        d1 = pd.DataFrame({"x": x, "y": y, "bin": pd.qcut(x, n)})
+        d2 = d1.groupby("bin", as_index=True)
         print(d1)
         r, p = spearmanr(d2.mean().x, d2.mean().y)
         print(r, p)
@@ -483,19 +481,19 @@ def mono_bin(x, y, n=20):
     bad = y.sum()
     good = total - bad
     d3 = pd.DataFrame()
-    d3['total'] = d2.y.count()  ##每个箱中的总样本数
-    d3['bad'] = d2.y.sum()  ##每个箱中的坏样本数
-    d3['good'] = d3['total'] - d3['bad']  ##每个箱中的好样本数
-    d3['bad_rate'] = d3['bad'] / d3['total'] * 100  ##每个箱中的坏样本率
-    d3['%bad'] = d3['bad'] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
-    d3['%good'] = d3['good'] / good * 100  ##每个箱中的好样本占总好样本的比重
-    d3['%cum_bad'] = d3['%bad'].cumsum()
-    d3['%cum_good'] = d3['%good'].cumsum()
-    d3['woe'] = np.log(d3['%bad'] / d3['%good'])
-    d3['bin_iv'] = (d3['%bad'] - d3['%good']) * d3['woe']
-    d3['iv'] = d3['bin_iv'].sum()
-    d3['bin_ks'] = d3['%cum_bad'] - d3['%cum_good']
-    d3['ks'] = d3['bin_ks'].max()
+    d3["total"] = d2.y.count()  ##每个箱中的总样本数
+    d3["bad"] = d2.y.sum()  ##每个箱中的坏样本数
+    d3["good"] = d3["total"] - d3["bad"]  ##每个箱中的好样本数
+    d3["bad_rate"] = d3["bad"] / d3["total"] * 100  ##每个箱中的坏样本率
+    d3["%bad"] = d3["bad"] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
+    d3["%good"] = d3["good"] / good * 100  ##每个箱中的好样本占总好样本的比重
+    d3["%cum_bad"] = d3["%bad"].cumsum()
+    d3["%cum_good"] = d3["%good"].cumsum()
+    d3["woe"] = np.log(d3["%bad"] / d3["%good"])
+    d3["bin_iv"] = (d3["%bad"] - d3["%good"]) * d3["woe"]
+    d3["iv"] = d3["bin_iv"].sum()
+    d3["bin_ks"] = d3["%cum_bad"] - d3["%cum_good"]
+    d3["ks"] = d3["bin_ks"].max()
     d3.reset_index(inplace=True)
     return d3
 
@@ -505,25 +503,24 @@ def bin_self(x, y, cut):  ##cut:自定义分箱（list）
     total = y.count()
     bad = y.sum()
     good = total - bad
-    d1 = pd.DataFrame({"x": x, "y": y, 'bin': pd.cut(x, cut)})  ##等距分箱
-    d2 = d1.groupby('bin', as_index=True)
+    d1 = pd.DataFrame({"x": x, "y": y, "bin": pd.cut(x, cut)})  ##等距分箱
+    d2 = d1.groupby("bin", as_index=True)
     d3 = pd.DataFrame()
-    d3['total'] = d2.y.count()  ##每个箱中的总样本数
-    d3['bad'] = d2.y.sum()  ##每个箱中的坏样本数
-    d3['good'] = d3['total'] - d3['bad']  ##每个箱中的好样本数
-    d3['bad_rate'] = d3['bad'] / d3['total'] * 100  ##每个箱中的坏样本率
-    d3['%bad'] = d3['bad'] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
-    d3['%good'] = d3['good'] / good * 100  ##每个箱中的好样本占总好样本的比重
-    d3['%cum_bad'] = d3['%bad'].cumsum()
-    d3['%cum_good'] = d3['%good'].cumsum()
-    d3['woe'] = np.log(d3['%bad'] / d3['%good'])
-    d3['bin_iv'] = (d3['%bad'] - d3['%good']) * d3['woe']
-    d3['iv'] = d3['bin_iv'].sum()
-    d3['bin_ks'] = d3['%cum_bad'] - d3['%cum_good']
-    d3['ks'] = d3['bin_ks'].max()
+    d3["total"] = d2.y.count()  ##每个箱中的总样本数
+    d3["bad"] = d2.y.sum()  ##每个箱中的坏样本数
+    d3["good"] = d3["total"] - d3["bad"]  ##每个箱中的好样本数
+    d3["bad_rate"] = d3["bad"] / d3["total"] * 100  ##每个箱中的坏样本率
+    d3["%bad"] = d3["bad"] / bad * 100  ##每个箱中的坏样本占总坏样本的比重
+    d3["%good"] = d3["good"] / good * 100  ##每个箱中的好样本占总好样本的比重
+    d3["%cum_bad"] = d3["%bad"].cumsum()
+    d3["%cum_good"] = d3["%good"].cumsum()
+    d3["woe"] = np.log(d3["%bad"] / d3["%good"])
+    d3["bin_iv"] = (d3["%bad"] - d3["%good"]) * d3["woe"]
+    d3["iv"] = d3["bin_iv"].sum()
+    d3["bin_ks"] = d3["%cum_bad"] - d3["%cum_good"]
+    d3["ks"] = d3["bin_ks"].max()
     d3.reset_index(inplace=True)
     return d3
-
 
 
 # Examples:
@@ -537,11 +534,8 @@ def bin_self(x, y, cut):  ##cut:自定义分箱（list）
 # bins_bestks = bin_self(df['决策分数'], df['target'], a)
 
 
-
-
-
 # 测试
-'''
+"""
 df['score_bins1'] = pd.cut(df['决策分数'], bins=get_cart_bincut(df, '决策分数', 'target'))
 df['score_bins2'] = pd.cut(df['决策分数'], bins=get_chimerge_bincut(df, '决策分数', 'target'))
 df['score_bins3'] = pd.cut(df['决策分数'], bins=get_bestks_bincut(df, '决策分数', 'target'))
@@ -568,5 +562,4 @@ print("income:", iv_count(df, 'income', 'target'))
 print("income_cart_bins:", iv_count(df, 'income_bins1', 'target'))
 print("income_chimerge_bins:", iv_count(df, 'income_bins2', 'target'))
 print("income_bestks_bins:", iv_count(df, 'income_bins3', 'target'))
-'''
-
+"""
