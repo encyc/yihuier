@@ -68,19 +68,23 @@ yh.me_module.plot_model_ks(y_test, y_pred)
 
 | 模块 | 功能 | 文档 |
 |------|------|------|
-| `EDAModule` | 探索性数据分析 | [docs/01-eda.md](docs/01-eda.md) |
-| `DataProcessingModule` | 数据预处理 | [docs/02-data-processing.md](docs/02-data-processing.md) |
-| `BinningModule` | 变量分箱 | [docs/03-binning.md](docs/03-binning.md) |
-| `VarSelectModule` | 变量选择 | [docs/04-var-select.md](docs/04-var-select.md) |
-| `ModelEvaluationModule` | 模型评估 | [docs/05-model-evaluation.md](docs/05-model-evaluation.md) |
-| `ScorecardImplementModule` | 评分卡实现 | [docs/06-scorecard-implement.md](docs/06-scorecard-implement.md) |
-| `ScorecardMonitorModule` | 评分卡监控 | [docs/07-scorecard-monitor.md](docs/07-scorecard-monitor.md) |
-| `ClusterModule` | 聚类分析 | [docs/08-cluster.md](docs/08-cluster.md) |
-| `PipelineModule` | 流水线 | [docs/09-pipeline.md](docs/09-pipeline.md) |
+| `EDAModule` | 探索性数据分析 | [📖 EDA 模块](https://encyc.github.io/yihuier/guide/modules/eda.html) |
+| `DataProcessingModule` | 数据预处理 | [📖 数据预处理](https://encyc.github.io/yihuier/guide/modules/data-processing.html) |
+| `BinningModule` | 变量分箱 | [📖 分箱模块](https://encyc.github.io/yihuier/guide/modules/binning.html) |
+| `VarSelectModule` | 变量选择 | [📖 变量选择](https://encyc.github.io/yihuier/guide/modules/var-select.html) |
+| `ModelEvaluationModule` | 模型评估 | [📖 模型评估](https://encyc.github.io/yihuier/guide/modules/model-evaluation.html) |
+| `ScorecardImplementModule` | 评分卡实现 | [📖 评分卡实现](https://encyc.github.io/yihuier/guide/modules/scorecard-implement.html) |
+| `ScorecardMonitorModule` | 评分卡监控 | [📖 评分卡监控](https://encyc.github.io/yihuier/guide/modules/scorecard-monitor.html) |
+| `ClusterModule` | 聚类分析 | [📖 聚类模块](https://encyc.github.io/yihuier/guide/modules/cluster.html) |
+| `PipelineModule` | 流水线 | [📖 流水线模块](https://encyc.github.io/yihuier/guide/modules/pipeline.html) |
 
-## 详细文档
+## 📚 完整文档
 
-每个模块的详细使用说明和API文档，请查看 [docs/](docs/) 目录。
+- **[在线文档](https://encyc.github.io/yihuier/)** - VitePress 部署的完整文档网站
+- **[快速开始](https://encyc.github.io/yihuier/guide/quick-start)** - 5分钟快速上手
+- **[API 参考](https://encyc.github.io/yihuier/guide/api)** - 完整的 API 文档
+- **[最佳实践](https://encyc.github.io/yihuier/guide/best-practices)** - 行业最佳实践指南
+- **[示例集合](https://encyc.github.io/yihuier/guide/examples)** - 常用场景代码示例
 
 ## 开发
 
