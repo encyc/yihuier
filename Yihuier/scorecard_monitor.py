@@ -1,3 +1,4 @@
+from typing import Optional, Tuple
 import matplotlib.pyplot as plt
 
 import numpy as np
@@ -9,11 +10,17 @@ import seaborn as sns
 # 评分卡实现
 class ScorecardMonitorModule:
 
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
 
     # 绘制变量的得分占比偏移图
-    def plot_var_shift(self, df, day_col, score_col, plt_size=None):
+    def plot_var_shift(
+        self,
+        df: pd.DataFrame,
+        day_col: str,
+        score_col: str,
+        plt_size: Optional[Tuple[int, int]] = None
+    ) -> None:
         """
         df:变量在一段时间内，每个区间上的得分
         day_col:时间的字段名（天）
@@ -92,7 +99,16 @@ class ScorecardMonitorModule:
         plt.show()
 
     # 计算评分的PSI
-    def score_psi(self, df1, df2, id_col, score_col, x, y, step=None):
+    def score_psi(
+        self,
+        df1: pd.DataFrame,
+        df2: pd.DataFrame,
+        id_col: str,
+        score_col: str,
+        x: float,
+        y: float,
+        step: Optional[float] = None
+    ) -> pd.DataFrame:
         """
         df1:建模样本的得分,包含用户id,得分
         df2:上线样本的得分，包含用户id，得分
@@ -120,7 +136,7 @@ class ScorecardMonitorModule:
         return score_compare
 
     # 评分比较分布图
-    def plot_score_compare(self, df, plt_size=None):
+    def plot_score_compare(self, df: pd.DataFrame, plt_size: Optional[Tuple[int, int]] = None) -> None:
         fig = plt.figure(figsize=plt_size)
         x = df.score_bin
         y1 = df.建模户数占比
@@ -136,7 +152,15 @@ class ScorecardMonitorModule:
         return plt.show()
 
     # 变量稳定度分析
-    def var_stable(self, score_result, df, var, id_col, score_col, bins):
+    def var_stable(
+        self,
+        score_result: pd.DataFrame,
+        df: pd.DataFrame,
+        var: str,
+        id_col: str,
+        score_col: str,
+        bins: list
+    ) -> pd.DataFrame:
         """
         score_result:评分卡的score明细表，包含区间，用户数，用户占比,得分
         var：分析的变量名

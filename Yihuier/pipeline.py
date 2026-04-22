@@ -1,4 +1,5 @@
 # 在 main.py 或者 __init__.py 中创建主类 Yihui
+from typing import List
 import warnings
 import pandas as pd
 import numpy as np
@@ -7,10 +8,10 @@ from yihuier.constants import MISSING_VALUE_NEG_999
 
 class PipelineModule:
 
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
 
-    def product_test(self):
+    def product_test(self) -> pd.DataFrame:
         # 打印变量
         print("Categorical Variables:", self.yihuier_instance.get_categorical_variables())
         print("Numeric Variables:", self.yihuier_instance.get_numeric_variables())

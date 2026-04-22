@@ -1,4 +1,6 @@
+from typing import Optional, List, Tuple
 import matplotlib.pyplot as plt
+import matplotlib.figure
 import pandas as pd
 import seaborn as sns
 from scipy.stats import entropy
@@ -10,15 +12,29 @@ except ImportError:
     YDATA_PROFILING_AVAILABLE = False
 
 class EDAModule:
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
+        """初始化EDA模块
+
+        Args:
+            yihuier_instance: Yihuier 主实例
+        """
         self.yihuier_instance = yihuier_instance
-        self.data = self.yihuier_instance.data.copy()
-        self.variables = self.yihuier_instance.data.columns
-        self.category_variables = self.yihuier_instance.get_categorical_variables()
-        self.numeric_variables = self.yihuier_instance.get_numeric_variables()
+        self.data: pd.DataFrame = self.yihuier_instance.data.copy()
+        self.variables = pd.Index = self.yihuier_instance.data.columns
+        self.category_variables: List[str] = self.yihuier_instance.get_categorical_variables()
+        self.numeric_variables: List[str] = self.yihuier_instance.get_numeric_variables()
 
     # 类别型变量的分布
-    def plot_cate_var(self, col_list, hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None, y=None):
+    def plot_cate_var(
+        self,
+        col_list: List[str],
+        hspace: float = 0.4,
+        wspace: float = 0.4,
+        plt_size: Optional[Tuple[int, int]] = None,
+        plt_num: Optional[int] = None,
+        x: Optional[int] = None,
+        y: Optional[int] = None
+    ) -> None:
         """
         self.yihuier_instance.data:数据集
         col_list:变量list集合
@@ -43,8 +59,17 @@ class EDAModule:
         return plt.show()
 
     # 数值型变量的分布
-    def plot_num_col(self, col_list, plt_type='hist', hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None,
-                     y=None):
+    def plot_num_col(
+        self,
+        col_list: List[str],
+        plt_type: str = 'hist',
+        hspace: float = 0.4,
+        wspace: float = 0.4,
+        plt_size: Optional[Tuple[int, int]] = None,
+        plt_num: Optional[int] = None,
+        x: Optional[int] = None,
+        y: Optional[int] = None
+    ) -> None:
         """
         col_list:变量list集合
         hspace :子图之间的间隔(y轴方向)
@@ -82,7 +107,16 @@ class EDAModule:
         return plt.show()
 
     # 类别型变量的违约率分析
-    def plot_default_cate(self, col_list, hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None, y=None):
+    def plot_default_cate(
+        self,
+        col_list: List[str],
+        hspace: float = 0.4,
+        wspace: float = 0.4,
+        plt_size: Optional[Tuple[int, int]] = None,
+        plt_num: Optional[int] = None,
+        x: Optional[int] = None,
+        y: Optional[int] = None
+    ) -> None:
         """
         col_list:变量list集合
         hspace :子图之间的间隔(y轴方向)
@@ -118,8 +152,17 @@ class EDAModule:
         return plt.show()
 
     # 数值型变量的违约率分析
-    def plot_default_num(self, col_list, hspace=0.4, wspace=0.4, q=None, plt_size=None, plt_num=None, x=None,
-                         y=None):
+    def plot_default_num(
+        self,
+        col_list: List[str],
+        hspace: float = 0.4,
+        wspace: float = 0.4,
+        q: Optional[int] = None,
+        plt_size: Optional[Tuple[int, int]] = None,
+        plt_num: Optional[int] = None,
+        x: Optional[int] = None,
+        y: Optional[int] = None
+    ) -> None:
         """
         self.yihuier_instance.data:数据集
         col_list:变量list集合
@@ -157,7 +200,7 @@ class EDAModule:
         return plt.show()
 
     # 使用ydata_profiling进行自动EDA，维度较高时，速度较慢
-    def auto_eda_profiling(self):
+    def auto_eda_profiling(self) -> None:
         # 使用pandas profiling进行自动EDA
         profile = ProfileReport(self.yihuier_instance.yihuier_instance.data,
                                 title="Report",
@@ -207,7 +250,7 @@ class EDAModule:
         return pd.DataFrame(numeric_stats).transpose()
 
     # 快速自动分析数据集（无图）
-    def auto_eda_simple(self):
+    def auto_eda_simple(self) -> pd.DataFrame:
         category_stats = self.__calculate_category_stats()
         numeric_stats = self.__calculate_numeric_stats()
 

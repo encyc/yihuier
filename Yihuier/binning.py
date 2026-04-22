@@ -1,3 +1,4 @@
+from typing import List, Optional, Tuple, Union
 import math
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +9,7 @@ from scipy.stats import spearmanr
 
 class BinningModule:
 
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
         self.bin_df = None
         self.woe_list = None
@@ -17,7 +18,7 @@ class BinningModule:
         self.woe_result_df = None
         self.data_woe = None
 
-    def binning_cate(self, col_list):
+    def binning_cate(self, col_list: List[str]) -> Tuple[list, list, list]:
         df = self.yihuier_instance.data
         target = self.yihuier_instance.target
 
@@ -282,7 +283,15 @@ class BinningModule:
         return cutoffpoints
 
     # 数值型变量的分箱
-    def binning_num(self, col_list, max_bin=None, min_binpct=None, method='ChiMerge', n=10, leaf_stop_percent=0.05):
+    def binning_num(
+        self,
+        col_list: List[str],
+        max_bin: Optional[int] = None,
+        min_binpct: Optional[float] = None,
+        method: str = 'ChiMerge',
+        n: int = 10,
+        leaf_stop_percent: float = 0.05
+    ) -> Tuple[list, list]:
         """
         df:数据集
         target:目标变量的字段名
@@ -372,7 +381,7 @@ class BinningModule:
         return bin_df, iv_value
 
     # 数值型变量的iv明细表
-    def iv_num(self, col_list, **kwargs):
+    def iv_num(self, col_list: List[str], **kwargs) -> pd.DataFrame:
         """
         df:数据集
         target:目标变量的字段名
@@ -397,7 +406,13 @@ class BinningModule:
 
 
     # 数值型变量的分箱（手动分箱）
-    def binning_num_manual(self, df, target, col, cut):
+    def binning_num_manual(
+        self,
+        df: pd.DataFrame,
+        target: str,
+        col: str,
+        cut: list
+    ) -> Tuple[list, list]:
         """
         df:数据集
         target:目标变量的字段名
@@ -461,7 +476,12 @@ class BinningModule:
 
 
     # 自定义分箱
-    def binning_self(self, col, cut=None, right_border=True):
+    def binning_self(
+        self,
+        col: str,
+        cut: Optional[list] = None,
+        right_border: bool = True
+    ) -> Tuple[pd.DataFrame, float]:
         """
         df: 数据集
         col:分箱的单个变量名
@@ -513,7 +533,15 @@ class BinningModule:
     # 变量分箱结果的检查
 
     # woe的可视化
-    def plot_woe(self, hspace=0.4, wspace=0.4, plt_size=None, plt_num=None, x=None, y=None):
+    def plot_woe(
+        self,
+        hspace: float = 0.4,
+        wspace: float = 0.4,
+        plt_size: Optional[Tuple[int, int]] = None,
+        plt_num: Optional[int] = None,
+        x: Optional[int] = None,
+        y: Optional[int] = None
+    ) -> None:
         """
         bin_df:list形式，里面存储每个变量的分箱结果
         hspace :子图之间的间隔(y轴方向)
@@ -539,7 +567,7 @@ class BinningModule:
         return plt.show()
 
     # 检验woe是否单调
-    def woe_monoton(self):
+    def woe_monoton(self) -> Tuple[list, pd.DataFrame]:
         """
         bin_df:list形式，里面存储每个变量的分箱结果
     
@@ -576,7 +604,7 @@ class BinningModule:
         return woe_notmonoton_col, woe_judge_df
 
     # 检查某个区间的woe是否大于1
-    def woe_large(self):
+    def woe_large(self) -> Tuple[list, pd.DataFrame]:
         """
         bin_df:list形式，里面存储每个变量的分箱结果
     
@@ -605,7 +633,7 @@ class BinningModule:
         return woe_large_col, woe_judge_df
 
     # 变量woe结果表
-    def woe_df_concat(self):
+    def woe_df_concat(self) -> pd.DataFrame:
         """
         bin_df:list形式，里面存储每个变量的分箱结果
 
@@ -629,7 +657,7 @@ class BinningModule:
         return woe_result_df
 
     # 变量woe转换
-    def woe_transform(self):
+    def woe_transform(self) -> pd.DataFrame:
         """
         df:数据集
         target:目标变量的字段名

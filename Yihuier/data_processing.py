@@ -1,10 +1,16 @@
+from typing import Optional, List, Union
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 
 class DataProcessingModule:
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
+        """初始化数据处理模块
+
+        Args:
+            yihuier_instance: Yihuier 主实例
+        """
         self.yihuier_instance = yihuier_instance
 
     def __missing_var_cal(self):
@@ -41,7 +47,7 @@ class DataProcessingModule:
 
 
     # 所有变量缺失值分布图
-    def plot_bar_missing_var(self, plt_size=None):
+    def plot_bar_missing_var(self, plt_size: Optional[tuple] = None) -> None:
         """
         plt_size: plot chart size: (10, 10)
 
@@ -76,7 +82,12 @@ class DataProcessingModule:
 
 
     # 缺失值填充（类别型变量）
-    def fillna_cate_var(self, col_list, fill_type=None, fill_str=None):
+    def fillna_cate_var(
+        self,
+        col_list: List[str],
+        fill_type: Optional[str] = None,
+        fill_str: Optional[str] = None
+    ) -> pd.DataFrame:
         """
         data:数据集
         col_list:变量list集合
@@ -96,7 +107,13 @@ class DataProcessingModule:
     # 针对缺失率在5%以下的变量用中位数填充
     # 缺失率在5%--15%的变量用随机森林填充,可先对缺失率较低的变量先用中位数填充，在用没有缺失的样本来对变量作随机森林填充
     # 缺失率超过15%的变量建议当作一个类别
-    def fillna_num_var(self, col_list, fill_type=None, fill_class_num=None, filled_data=None):
+    def fillna_num_var(
+        self,
+        col_list: List[str],
+        fill_type: Optional[str] = None,
+        fill_class_num: Optional[float] = None,
+        filled_data: Optional[pd.DataFrame] = None
+    ) -> pd.DataFrame:
         """
         data:数据集
         col_list:变量list集合
@@ -128,7 +145,7 @@ class DataProcessingModule:
         return data2
 
     # 缺失值剔除（单个变量）
-    def delete_missing_var(self, threshold=None):
+    def delete_missing_var(self, threshold: float) -> pd.DataFrame:
         """
         data:数据集
         threshold:缺失率删除的阈值
@@ -143,7 +160,7 @@ class DataProcessingModule:
         print('缺失率超过{}的变量个数为{}'.format(threshold, missing_col_num))
         return data2
 
-    def delete_missing_obs(self, threshold=None):
+    def delete_missing_obs(self, threshold: Union[float, int]) -> pd.DataFrame:
         """
         删除包含超过阈值数量的缺失值的 observation
 
@@ -167,7 +184,7 @@ class DataProcessingModule:
         return data2
 
     # 常变量/同值化处理
-    def const_delete(self, threshold=0.9):
+    def const_delete(self, threshold: float = 0.9) -> pd.DataFrame:
         """
         删除常变量/同值化处理
 
@@ -192,7 +209,7 @@ class DataProcessingModule:
         return data_after_const_delete
 
     # 缺失目标变量删除
-    def target_missing_delete(self):
+    def target_missing_delete(self) -> Optional[pd.DataFrame]:
         """
         删除目标变量为空的观测
 
@@ -208,7 +225,11 @@ class DataProcessingModule:
             print('未指定目标变量，无法执行删除操作。')
 
     # 日期变量转换为二进制变量
-    def date_var_shift_binary(self, col_list, replace=False):
+    def date_var_shift_binary(
+        self,
+        col_list: List[str],
+        replace: bool = False
+    ) -> pd.DataFrame:
         """
         将指定的日期型变量转换成二进制变量
 

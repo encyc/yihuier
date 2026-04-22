@@ -1,18 +1,26 @@
+from typing import Optional, Tuple, Union
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from sklearn.base import BaseEstimator
 
 
 # 评分卡实现
 
 class ScorecardImplementModule:
 
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
 
     # 评分卡刻度
-    def cal_scale(self, score, odds, PDO, model):
+    def cal_scale(
+        self,
+        score: float,
+        odds: float,
+        PDO: float,
+        model: BaseEstimator
+    ) -> Tuple[float, float, float]:
         """
         odds：设定的坏好比
         score:在这个odds下的分数
@@ -30,7 +38,12 @@ class ScorecardImplementModule:
         return A, B, base_score
 
     # 变量得分表
-    def score_df_concat(self, woe_df, model, B):
+    def score_df_concat(
+        self,
+        woe_df: pd.DataFrame,
+        model: BaseEstimator,
+        B: float
+    ) -> pd.DataFrame:
         """
         woe_df: woe结果表
         model:逻辑回归模型
@@ -51,7 +64,12 @@ class ScorecardImplementModule:
         return score_df
 
     # 分数转换
-    def score_transform(self, df, target, df_score):
+    def score_transform(
+        self,
+        df: pd.DataFrame,
+        target: str,
+        df_score: pd.DataFrame
+    ) -> pd.DataFrame:
         """
         df:数据集
         target:目标变量的字段名
@@ -79,7 +97,12 @@ class ScorecardImplementModule:
         return df2
 
     # 得分的KS
-    def plot_score_ks(self, df, score_col, target):
+    def plot_score_ks(
+        self,
+        df: pd.DataFrame,
+        score_col: str,
+        target: str
+    ) -> None:
         """
         df:数据集
         target:目标变量的字段名
@@ -119,7 +142,13 @@ class ScorecardImplementModule:
         plt.show()
 
     # PR曲线
-    def plot_PR(self, df, score_col, target, plt_size=None):
+    def plot_PR(
+        self,
+        df: pd.DataFrame,
+        score_col: str,
+        target: str,
+        plt_size: Optional[Tuple[int, int]] = None
+    ) -> None:
         """
         df:得分的数据集
         score_col:分数的字段名
@@ -154,7 +183,14 @@ class ScorecardImplementModule:
         return plt.show()
 
     # 得分分布图
-    def plot_score_hist(self, df, target, score_col, plt_size=None, cutoff=None):
+    def plot_score_hist(
+        self,
+        df: pd.DataFrame,
+        target: str,
+        score_col: str,
+        plt_size: Optional[Tuple[int, int]] = None,
+        cutoff: Optional[float] = None
+    ) -> None:
         """
         df:数据集
         target:目标变量的字段名
@@ -175,7 +211,15 @@ class ScorecardImplementModule:
         plt.show()
 
     # 得分明细表
-    def score_info(self, df, score_col, target, x=None, y=None, step=None):
+    def score_info(
+        self,
+        df: pd.DataFrame,
+        score_col: str,
+        target: str,
+        x: Optional[float] = None,
+        y: Optional[float] = None,
+        step: Optional[float] = None
+    ) -> pd.DataFrame:
         """
         df:数据集
         target:目标变量的字段名
@@ -208,7 +252,14 @@ class ScorecardImplementModule:
         return score_info_df
 
     # 绘制提升图和洛伦兹曲线
-    def plot_lifting(self, df, score_col, target, bins=10, plt_size=None):
+    def plot_lifting(
+        self,
+        df: pd.DataFrame,
+        score_col: str,
+        target: str,
+        bins: int = 10,
+        plt_size: Optional[Tuple[int, int]] = None
+    ) -> None:
         """
         df:数据集，包含最终的得分
         score_col:最终分数的字段名
@@ -267,7 +318,13 @@ class ScorecardImplementModule:
         return plt.show()
 
     # 设定cutoff点，衡量有效性
-    def rule_verify(self, df, col_score, target, cutoff):
+    def rule_verify(
+        self,
+        df: pd.DataFrame,
+        col_score: str,
+        target: str,
+        cutoff: float
+    ) -> pd.DataFrame:
         """
         df:数据集
         target:目标变量的字段名

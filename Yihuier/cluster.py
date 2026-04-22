@@ -1,3 +1,4 @@
+from typing import List, Optional
 import matplotlib.pyplot as plt
 
 # plt.style.use('science')
@@ -18,12 +19,12 @@ from sklearn.mixture import GaussianMixture  # 高斯模糊
 from tqdm import tqdm
 
 class ClusterModule():
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
 
     # 亲和力传播
     # cluster_AffinityPropagation(df,['v1','v2'],damping = 0.9)
-    def cluster_AffinityPropagation(self, col_list, damping=0.9):
+    def cluster_AffinityPropagation(self, col_list: List[str], damping: float = 0.9) -> None:
         """
         亲和力传播包括找到一组最能概括数据的范例。
         我们设计了一种名为“亲和传播”的方法，它作为两对数据点之间相似度的输入度量。在数据点之间交换实值消息，直到一组高质量的范例和相应的群集逐渐出现。
@@ -52,7 +53,7 @@ class ClusterModule():
 
     # 聚合聚类
     # cluster_AgglomerativeClustering(df,['v1','v2'],n_clusters = 2)
-    def cluster_AgglomerativeClustering(self, col_list, n_clusters=2):
+    def cluster_AgglomerativeClustering(self, col_list: List[str], n_clusters: int = 2) -> None:
         """
         聚合聚类涉及合并示例，直到达到所需的群集数量为止。
         它是层次聚类方法的更广泛类的一部分，通过AgglomerationClustering类实现的。
@@ -79,7 +80,7 @@ class ClusterModule():
 
     # BIRCH聚类
     # cluster_Birch(df,['v1','v2'],threshold = 0.01, n_clusters = 2)
-    def cluster_Birch(self, col_list, threshold=0.01, n_clusters=2):
+    def cluster_Birch(self, col_list: List[str], threshold: float = 0.01, n_clusters: int = 2) -> None:
         """
         BIRCH 聚类（ BIRCH 是平衡迭代减少的缩写，聚类使用层次结构)
         包括构造一个树状结构，从中提取聚类质心。
@@ -107,7 +108,7 @@ class ClusterModule():
 
     # DBSCAN聚类
     # cluster_DBSCAN(df,col_list,eps=0.30, min_samples=9)
-    def cluster_DBSCAN(self, col_list, eps=0.30, min_samples=9):
+    def cluster_DBSCAN(self, col_list: List[str], eps: float = 0.30, min_samples: int = 9) -> None:
         """
         DBSCAN 聚类（其中 DBSCAN 是基于密度的空间聚类的噪声应用程序）
         涉及在域中寻找高密度区域，并将其周围的特征空间区域扩展为群集。
@@ -135,7 +136,7 @@ class ClusterModule():
 
     # K-Means聚类
     # cluster_KMeans(df,col_list,n_clusters=10)
-    def cluster_KMeans(self, col_list, n_clusters=2):
+    def cluster_KMeans(self, col_list: List[str], n_clusters: int = 2) -> None:
         """
         K-均值聚类可以是最常见的聚类算法，并涉及向群集分配示例，以尽量减少每个群集内的方差。
         本文的主要目的是描述一种基于样本将 N 维种群划分为 k 个集合的过程。
@@ -164,7 +165,7 @@ class ClusterModule():
 
     # Mini-Batch K-Means聚类
     # cluster_MiniBatchKMeans(df,col_list,n_clusters = 10)
-    def cluster_MiniBatchKMeans(self, col_list, n_clusters=2):
+    def cluster_MiniBatchKMeans(self, col_list: List[str], n_clusters: int = 2) -> None:
         """
         Mini-Batch K-均值是 K-均值的修改版本。
         它使用小批量的样本而不是整个数据集对群集质心进行更新，这可以使大数据集的更新速度更快，并且可能对统计噪声更健壮。
@@ -194,7 +195,7 @@ class ClusterModule():
 
     # 均值飘逸聚类
     # cluster_MeanShift(df,col_list)
-    def cluster_MeanShift(self, col_list):
+    def cluster_MeanShift(self, col_list: List[str]) -> None:
         """
         均值漂移聚类涉及到根据特征空间中的实例密度来寻找和调整质心。
         对离散数据证明了递推平均移位程序收敛到最接近驻点的基础密度函数，从而证明了它在检测密度模式中的应用。
@@ -222,7 +223,7 @@ class ClusterModule():
 
     # OPTICS聚类
     # cluster_OPTICS(df,col_list,eps=0.8,min_samples=10)
-    def cluster_OPTICS(self, col_list, eps=0.8, min_samples=10):
+    def cluster_OPTICS(self, col_list: List[str], eps: float = 0.8, min_samples: int = 10) -> None:
         """
         OPTICS 聚类（ OPTICS 短于订购点数以标识聚类结构）是上述 DBSCAN 的修改版本。
         我们为聚类分析引入了一种新的算法，它不会显式地生成一个数据集的聚类；
@@ -250,7 +251,7 @@ class ClusterModule():
 
     # 光谱聚类
     # cluster_SpectralClustering(df,col_list,n_clusters=10)
-    def cluster_SpectralClustering(self, col_list, n_clusters=2):
+    def cluster_SpectralClustering(self, col_list: List[str], n_clusters: int = 2) -> None:
         """
         光谱聚类是一类通用的聚类方法，取自线性线性代数。
         最近在许多领域出现的一个有希望的替代方案是使用聚类的光谱方法。
@@ -277,7 +278,7 @@ class ClusterModule():
 
     # 高斯混合聚类
     # cluster_GaussianMixture(df,col_list,n_components=10)
-    def cluster_GaussianMixture(self, col_list, n_components=2):
+    def cluster_GaussianMixture(self, col_list: List[str], n_components: int = 2) -> None:
         """
         高斯混合模型总结了一个多变量概率密度函数，顾名思义就是混合了高斯概率分布。
         """

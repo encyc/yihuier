@@ -1,18 +1,25 @@
-import matplotlib.pyplot as plt
+from typing import Optional, Tuple, Union
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn.model_selection import cross_val_score
+from sklearn.base import BaseEstimator
 
 class ModelEvaluationModule:
 
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
+        """初始化模型评估模块
+
+        Args:
+            yihuier_instance: Yihuier 主实例
+        """
         self.yihuier_instance = yihuier_instance
-        self.y_label = None
-        self.y_pred = None
+        self.y_label: Optional[np.ndarray] = None
+        self.y_pred: Optional[np.ndarray] = None
 
 
     # plot AUC
-    def plot_roc(self, y_label, y_pred):
+    def plot_roc(self, y_label: np.ndarray, y_pred: np.ndarray) -> None:
         """
         y_label:测试集的y
         y_pred:对测试集预测后的概率
@@ -32,7 +39,7 @@ class ModelEvaluationModule:
         plt.show()
 
     # plot KS
-    def plot_model_ks(self, y_label, y_pred):
+    def plot_model_ks(self, y_label: np.ndarray, y_pred: np.ndarray) -> None:
         """
         y_label:测试集的y
         y_pred:对测试集预测后的概率
@@ -73,7 +80,7 @@ class ModelEvaluationModule:
         plt.show()
 
     # KS
-    def model_ks(self, y_label, y_pred):
+    def model_ks(self, y_label: np.ndarray, y_pred: np.ndarray) -> float:
         """
         y_label:测试集的y
         y_pred:对测试集预测后的概率
@@ -108,7 +115,15 @@ class ModelEvaluationModule:
 
 
     # 学习曲线
-    def plot_learning_curve(self, estimator, x, y, cv=None, train_size=np.linspace(0.1, 1.0, 5), plt_size=None):
+    def plot_learning_curve(
+        self,
+        estimator: BaseEstimator,
+        x: np.ndarray,
+        y: np.ndarray,
+        cv: Optional[int] = None,
+        train_size: np.ndarray = np.linspace(0.1, 1.0, 5),
+        plt_size: Optional[Tuple[int, int]] = None
+    ) -> None:
         """
         estimator :画学习曲线的基模型
         x:自变量的数据集
@@ -143,7 +158,14 @@ class ModelEvaluationModule:
         return plt.show()
 
     # 交叉验证
-    def cross_verify(self, x, y, estimators, fold, scoring='roc_auc'):
+    def cross_verify(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        estimators: BaseEstimator,
+        fold: int,
+        scoring: str = 'roc_auc'
+    ) -> None:
         """
         x:自变量的数据集
         y:target的数据集
@@ -169,7 +191,7 @@ class ModelEvaluationModule:
     # plot_matrix_report(y_test,y_pred_proc)
 
     # 混淆矩阵 /分类报告
-    def plot_matrix_report(self, y_label, y_pred):
+    def plot_matrix_report(self, y_label: np.ndarray, y_pred: np.ndarray) -> None:
         """
         y_label:测试集的y
         y_pred:对测试集预测后的概率

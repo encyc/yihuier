@@ -1,3 +1,4 @@
+from typing import List, Optional, Tuple, Union
 import random
 import matplotlib.pyplot as plt
 # plt.style.use('science')
@@ -15,14 +16,14 @@ from xgboost import XGBClassifier
 
 class VarSelectModule:
 
-    def __init__(self, yihuier_instance):
+    def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
         self.xg_fea_imp = None
         self.rf_fea_imp = None
         self.selected_var = None
 
     # xgboost筛选变量
-    def select_xgboost(self, col_list, imp_num=None):
+    def select_xgboost(self, col_list: List[str], imp_num: Optional[int] = None) -> Tuple[pd.DataFrame, pd.DataFrame, List[str]]:
         """
         df:数据集
         target:目标变量的字段名
@@ -52,7 +53,7 @@ class VarSelectModule:
         return xg_fea_imp, xg_fea_imp_rank, xg_select_col
 
     # 随机森林筛选变量
-    def select_rf(self, col_list, imp_num=None):
+    def select_rf(self, col_list: List[str], imp_num: Optional[int] = None) -> Tuple[pd.DataFrame, List[str]]:
         """
         df:数据集
         target:目标变量的字段名
@@ -79,7 +80,14 @@ class VarSelectModule:
         return rf_fea_imp, rf_select_col
 
     # 相关性可视化
-    def plot_corr(self, col_list, threshold=None, mask_direction='lt', plt_size=None, is_annot=False):
+    def plot_corr(
+        self,
+        col_list: List[str],
+        threshold: Optional[float] = None,
+        mask_direction: str = 'lt',
+        plt_size: Optional[Tuple[int, int]] = None,
+        is_annot: bool = False
+    ) -> None:
         """
         df:数据集
         col_list:变量list集合
@@ -100,7 +108,12 @@ class VarSelectModule:
         return plt.show()
 
     # 相关性变量映射关系
-    def corr_mapping(self, col_list, threshold=None, direction='lt'):
+    def corr_mapping(
+        self,
+        col_list: List[str],
+        threshold: Optional[float] = None,
+        direction: str = 'lt'
+    ) -> pd.DataFrame:
         """
         df:数据集
         col_list:变量list集合
@@ -140,7 +153,7 @@ class VarSelectModule:
     # 相关性剔除
         return corr_map_df
 
-    def forward_delete_corr(self, col_list, threshold=None):
+    def forward_delete_corr(self, col_list: List[str], threshold: Optional[float] = None) -> List[str]:
         """
         df:数据集
         col_list:变量list集合
@@ -162,7 +175,7 @@ class VarSelectModule:
         return list_corr
 
     # 相关性剔除（考虑IV）
-    def forward_delete_corr_ivfirst(self, col_list, threshold=0.5):
+    def forward_delete_corr_ivfirst(self, col_list: List[str], threshold: float = 0.5) -> List[str]:
         '''
         df: 数据集
         col_list: 变量list
@@ -224,7 +237,7 @@ class VarSelectModule:
 
 
     # 相关性剔除（考虑xgboost_imp or rf_imp）
-    def forward_delete_corr_impfirst(self, col_list, type, threshold=0.5):
+    def forward_delete_corr_impfirst(self, col_list: List[str], type: str, threshold: float = 0.5) -> List[str]:
         '''
         df: 数据集
         col_list: 变量list
@@ -285,7 +298,17 @@ class VarSelectModule:
 
     # depth_first_search
 
-    def depth_first_search(x_train, y_train, x_test, y_test, col_list, col_initial, loop_num, length):
+    def depth_first_search(
+        self,
+        x_train: pd.DataFrame,
+        y_train: pd.Series,
+        x_test: pd.DataFrame,
+        y_test: pd.Series,
+        col_list: List[str],
+        col_initial: List[str],
+        loop_num: int,
+        length: int
+    ) -> pd.DataFrame:
         """
         x_train: 训练集x
         y_train: 训练集target
@@ -397,7 +420,7 @@ class VarSelectModule:
 
 
     # 显著性筛选,在筛选前需要做woe转换
-    def forward_delete_pvalue(x_train, y_train):
+    def forward_delete_pvalue(self, x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[List[str], str]:
         """
         x_train -- x训练集
         y_train -- y训练集
@@ -423,7 +446,7 @@ class VarSelectModule:
         return pvalues_col, lr.summary2()
 
     # 逻辑回归系数符号筛选,在筛选前需要做woe转换
-    def forward_delete_coef(self, x_train, y_train):
+    def forward_delete_coef(self, x_train: pd.DataFrame, y_train: pd.Series) -> Tuple[List[str], pd.DataFrame]:
         """
         x_train -- x训练集
         y_train -- y训练集
