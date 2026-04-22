@@ -1,6 +1,6 @@
 # 示例
 if __name__ == "__main__":
-    from Yihuier.yihuier import Yihuier
+    from yihuier.yihuier import Yihuier
     import warnings
     import pandas as pd
 

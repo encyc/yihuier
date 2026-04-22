@@ -2,6 +2,7 @@
 import warnings
 import pandas as pd
 import numpy as np
+from yihuier.constants import MISSING_VALUE_NEG_999
 
 
 class PipelineModule:
@@ -24,7 +25,7 @@ class PipelineModule:
         # self.yihuier_instance.data = self.yihuier_instance.data.drop(self.yihuier_instance.get_categorical_variables(),axis = 1)
 
         # 填充数值型变量空值
-        self.yihuier_instance.data = self.yihuier_instance.dp_module.fillna_num_var(self.yihuier_instance.get_numeric_variables(), fill_type='class', fill_class_num=-999)
+        self.yihuier_instance.data = self.yihuier_instance.dp_module.fillna_num_var(self.yihuier_instance.get_numeric_variables(), fill_type='class', fill_class_num=MISSING_VALUE_NEG_999)
         # 删除数值型变量
         self.yihuier_instance.data = self.yihuier_instance.dp_module.delete_missing_var(threshold=0.01)
         # 展示空值分布
@@ -60,7 +61,7 @@ class PipelineModule:
 
 # 示例
 # if __name__ == "__main__":
-#     from Yihuier.yihuier import Yihuier
+#     from yihuier.yihuier import Yihuier
 #
 #     # ban FutureWarning
 #     warnings.filterwarnings('ignore')

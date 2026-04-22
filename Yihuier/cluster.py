@@ -17,7 +17,7 @@ from sklearn.mixture import GaussianMixture  # 高斯模糊
 
 from tqdm import tqdm
 
-class ClusterMuodule():
+class ClusterModule():
     def __init__(self, yihuier_instance):
         self.yihuier_instance = yihuier_instance
 

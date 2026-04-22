@@ -37,8 +37,11 @@ class VarSelectModule:
         x = self.yihuier_instance.data[col_list].copy()
         y = self.yihuier_instance.data[target]
 
-        xgmodel = XGBClassifier(random_state=0)
-        xgmodel = xgmodel.fit(x, y, eval_metric='auc')
+        xgmodel = XGBClassifier(
+            random_state=0,
+            eval_metric='auc'  # XGBoost 2.x 需要在构造函数中设置
+        )
+        xgmodel = xgmodel.fit(x, y)
         xg_fea_imp = pd.DataFrame({'col': list(x.columns),
                                    'imp': xgmodel.feature_importances_})
         xg_fea_imp_rank = xg_fea_imp.sort_values('imp', ascending=False).reset_index(drop=True).iloc[:imp_num, :]
@@ -264,9 +267,17 @@ class VarSelectModule:
         if type == 'xgboost':
             if self.xg_fea_imp is not None:
                 fea_imp = self.xg_fea_imp.sort_values(by='imp',ascending=False)
-            elif self.xg_fea_imp is None:
+            else:
                fea_imp,_,_ = self.select_xgboost(col_list)
                fea_imp = fea_imp.sort_values(by='imp',ascending=False)
+        elif type == 'rf':
+            if self.rf_fea_imp is not None:
+                fea_imp = self.rf_fea_imp.sort_values(by='imp',ascending=False)
+            else:
+               fea_imp,_ = self.select_rf(col_list)
+               fea_imp = fea_imp.sort_values(by='imp',ascending=False)
+        else:
+            raise ValueError(f"不支持的 type 参数: {type}. 必须是 'xgboost' 或 'rf'")
 
         once = up_triangle(df, col_list, fea_imp, threshold)
         twice = up_triangle(df, once, fea_imp, threshold)

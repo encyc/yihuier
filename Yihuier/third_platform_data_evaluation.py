@@ -2,7 +2,8 @@
 import warnings
 import pandas as pd
 import numpy as np
-from Yihuier.yihuier import Yihuier
+from yihuier.yihuier import Yihuier
+from yihuier.constants import MISSING_VALUE_NEG_999
 
 # 在主程序中使用 Yihui 类
 if __name__ == "__main__":
@@ -43,7 +44,7 @@ if __name__ == "__main__":
     #     #     else:
     #     #         l.append(i)
     #
-    yi.data = yi.dp_module.fillna_num_var(yi.get_numeric_variables(), fill_type='class', fill_class_num=-999)
+    yi.data = yi.dp_module.fillna_num_var(yi.get_numeric_variables(), fill_type='class', fill_class_num=MISSING_VALUE_NEG_999)
     yi.data = yi.dp_module.delete_missing_var(threshold=0.01)
     # yi.dp_module.plot_bar_missing_var()
 

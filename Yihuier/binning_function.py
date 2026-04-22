@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import chi2
 from scipy.stats import spearmanr
+from yihuier.constants import SPLIT_POINT_NOT_FOUND, SPLIT_POINT_NOT_FOUND_ALT
 
 
 # 01 计算IV
@@ -91,7 +92,7 @@ def get_cart_split_point(data, var, target, min_sample):
     # 初始化
     Gini = calculate_gini(data[target].values)
     Best_Gini = 0.0
-    BestSplit_Point = -99999
+    BestSplit_Point = SPLIT_POINT_NOT_FOUND
     BestSplit_Position = 0.0
     median_list = get_var_median(data, var)  # 获取当前数据集指定元素的所有中位数列表
 
@@ -142,7 +143,7 @@ def get_cart_bincut(data, var, target, leaf_stop_percent=0.05):
     def cutting_data(data, var, target, min_sample, best_bincut):
         split_point, position = get_cart_split_point(data, var, target, min_sample)
 
-        if split_point != -99999:
+        if split_point != SPLIT_POINT_NOT_FOUND:
             best_bincut.append(split_point)
 
         # 根据最优切分点切分数据集，并对切分后的数据集递归计算切分点，直到满足停止条件
@@ -295,7 +296,7 @@ def get_maxks_split_point(data, var, target, min_sample=0.05):
         BestSplit_Position: 返回最优划分点的位置，最左边为0，最右边为1，float
     """
     if len(data) < min_sample:
-        ks_v, BestSplit_Point, BestSplit_Position = 0, -9999, 0.0
+        ks_v, BestSplit_Point, BestSplit_Position = 0, SPLIT_POINT_NOT_FOUND_ALT, 0.0
     else:
         # 计算每个组的卡方分箱点
         freq_df = pd.crosstab(index=data[var], columns=data[target])
@@ -303,7 +304,7 @@ def get_maxks_split_point(data, var, target, min_sample=0.05):
         if freq_array.shape[1] == 1:  # 如果某一组只有一个枚举值，如0或1，则数组形状会有问题，跳出本次计算
             # tt = np.zeros(freq_array.shape).T
             # freq_array = np.insert(freq_array, 0, values=tt, axis=1)
-            ks_v, BestSplit_Point, BestSplit_Position = 0, -99999, 0.0
+            ks_v, BestSplit_Point, BestSplit_Position = 0, SPLIT_POINT_NOT_FOUND, 0.0
         else:
             bincut = freq_df.index.values
             tmp = freq_array.cumsum(axis=0) / (np.ones(freq_array.shape) * freq_array.sum(axis=0).T)
@@ -332,7 +333,7 @@ def get_bestks_bincut(data, var, target, leaf_stop_percent=0.05):
     def cutting_data(data, var, target, min_sample, best_bincut):
         ks, split_point, position = get_maxks_split_point(data, var, target, min_sample)
 
-        if split_point != -99999:
+        if split_point != SPLIT_POINT_NOT_FOUND:
             best_bincut.append(split_point)
 
         # 根据最优切分点切分数据集，并对切分后的数据集递归计算切分点，直到满足停止条件

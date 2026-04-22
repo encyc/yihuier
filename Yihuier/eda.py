@@ -1,8 +1,13 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from ydata_profiling import ProfileReport
 from scipy.stats import entropy
+
+try:
+    from ydata_profiling import ProfileReport
+    YDATA_PROFILING_AVAILABLE = True
+except ImportError:
+    YDATA_PROFILING_AVAILABLE = False
 
 class EDAModule:
     def __init__(self, yihuier_instance):

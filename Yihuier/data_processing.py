@@ -173,6 +173,7 @@ class DataProcessingModule:
 
         Parameters:
         - threshold: 同值化处理的阈值，默认为 0.9
+                     如果某个列中某个值的占比超过此阈值，则认为是常变量
 
         Returns:
         删除常变量/同值化处理后的数据集
@@ -180,8 +181,8 @@ class DataProcessingModule:
         # 计算每一列中唯一值的比例
         unique_ratio = self.yihuier_instance.data.nunique() / len(self.yihuier_instance.data)
 
-        # 找到同值比例超过阈值的列
-        const_columns = unique_ratio[unique_ratio >= threshold].index
+        # 找到唯一值比例低于阈值的列（即常变量/同值化严重的列）
+        const_columns = unique_ratio[unique_ratio < threshold].index
 
         # 删除常变量/同值化处理后的数据集
         data_after_const_delete = self.yihuier_instance.data.drop(columns=const_columns)

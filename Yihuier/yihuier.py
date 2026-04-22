@@ -1,11 +1,11 @@
-from Yihuier.binning import BinningModule
-from Yihuier.eda import EDAModule
-from Yihuier.data_processing import DataProcessingModule
-from Yihuier.cluster import ClusterMuodule
-from Yihuier.var_selelct import VarSelectModule
-from Yihuier.model_evaluation import ModelEvaluationModule
-from Yihuier.scorecard_implement import ScorecardImplementModule
-from Yihuier.pipeline import PipelineModule
+from yihuier.binning import BinningModule
+from yihuier.eda import EDAModule
+from yihuier.data_processing import DataProcessingModule
+from yihuier.cluster import ClusterModule
+from yihuier.var_select import VarSelectModule
+from yihuier.model_evaluation import ModelEvaluationModule
+from yihuier.scorecard_implement import ScorecardImplementModule
+from yihuier.pipeline import PipelineModule
 
 import numpy as np
 import pandas as pd
@@ -19,7 +19,7 @@ class Yihuier:
         self.target = target
         self.eda_module = EDAModule(self)
         self.dp_module = DataProcessingModule(self)
-        self.cluster_module = ClusterMuodule(self)
+        self.cluster_module = ClusterModule(self)
         self.binning_module = BinningModule(self)
         self.var_select_module = VarSelectModule(self)
         self.me_module = ModelEvaluationModule(self)
@@ -29,8 +29,8 @@ class Yihuier:
 
     # 提取字符型变量的名字并返回一个list
     def get_categorical_variables(self):
-        # cate_vars = list(self.data.select_dtypes(include='object').columns)
-        cate_vars = self.data.select_dtypes(include=[np.object, 'category']).columns.tolist()
+        # 使用 'object' 而不是 np.object（NumPy 1.20+ 已弃用）
+        cate_vars = self.data.select_dtypes(include=['object', 'category']).columns.tolist()
 
         if self.target in cate_vars:
             cate_vars.remove(self.target)
