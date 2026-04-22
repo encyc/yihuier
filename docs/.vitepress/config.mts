@@ -18,6 +18,7 @@ export default withMermaid(defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: '指南', link: '/guide/intro' },
+      { text: 'AI Skill', link: '/guide/skill' },
       { text: 'API 参考', link: '/guide/api' },
       {
         text: '开发',
@@ -38,6 +39,7 @@ export default withMermaid(defineConfig({
           text: '开始',
           items: [
             { text: '项目简介', link: '/guide/intro' },
+            { text: 'AI 智能建模', link: '/guide/skill' },
             { text: '快速开始', link: '/guide/quick-start' },
             { text: '安装指南', link: '/guide/installation' },
           ]

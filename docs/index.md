@@ -14,6 +14,8 @@ hero:
       link: /guide/intro
 
 features:
+  - title: 🤖 AI 智能建模
+    details: 内置风控建模 Skill，AI 助手自动引导完成 10 步建模全流程，确保模型质量
   - title: 🎯 开箱即用
     details: 简洁的 API 设计，几行代码完成复杂建模流程
   - title: 🔧 专业完整

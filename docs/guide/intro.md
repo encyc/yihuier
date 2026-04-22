@@ -43,6 +43,21 @@ yh.dp_module.delete_missing_var(threshold=0.2)
 yh.binning_module.binning_num(col_list=['v1', 'v2'], max_bin=5)
 ```
 
+## AI 智能建模
+
+Yihuier 内置了专业的风控建模 **Skill**，让 AI 助手（如 Claude Code）成为你的建模助手：
+
+- **自动引导**：10 步完整建模流程，从数据探索到模型部署
+- **质量保证**：内置 AUC ≥ 0.65、KS ≥ 0.15、PSI < 0.25 质量标准
+- **智能诊断**：自动检测问题并提供优化建议
+- **最佳实践**：融合行业最佳实践和经验法则
+
+::: tip 使用 AI Skill
+如果你使用 Claude Code，只需说 "帮我建立信用评分卡模型"，Skill 会自动触发，AI 助手将引导你完成整个建模流程。
+
+查看 [AI Skill 文档](/guide/skill) 了解更多。
+:::
+
 ## 核心优势
 
 ### 1. 完整的建模流程支持
