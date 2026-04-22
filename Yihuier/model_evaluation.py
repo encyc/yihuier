@@ -29,7 +29,7 @@ class ModelEvaluationModule:
         ax.set_xlim(0, 1)
         ax.set_title('ROC')
         ax.legend(loc='best')
-        return plt.show(ax)
+        plt.show()
 
     # plot KS
     def plot_model_ks(self, y_label, y_pred):
@@ -70,7 +70,7 @@ class ModelEvaluationModule:
         ax.plot(pred_bin, ks_list, color='blue', label='good-bad')
         ax.set_title('KS:{:.3f}'.format(max(ks_list)))
         ax.legend(loc='best')
-        return plt.show(ax)
+        plt.show()
 
     # KS
     def model_ks(self, y_label, y_pred):

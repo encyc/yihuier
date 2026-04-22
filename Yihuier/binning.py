@@ -333,13 +333,8 @@ class BinningModule:
                 cut.insert(0, ninf)
                 cut.append(inf)
                 bucket = pd.cut(df[col], cut)
-                bucket = sorted(list(set(bucket))) # 去除重复的边界值
-                # 将无穷小和无穷大的边界值加入列表中
-                bucket.insert(0, -float('inf'))
-                bucket.append(float('inf'))
-                # 替换 -inf 为一个非限定的边界值
-                cut = [-float('inf') if x == -float('inf') else x for x in cut]
 
+            # Create d1 for all methods
             d1 = df.groupby(bucket)
             d2 = pd.DataFrame()
             d2['min_bin'] = d1[col].min()

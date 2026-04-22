@@ -1,3 +1,4 @@
+from typing import Optional, List, Union
 from yihuier.binning import BinningModule
 from yihuier.eda import EDAModule
 from yihuier.data_processing import DataProcessingModule
@@ -10,35 +11,66 @@ from yihuier.pipeline import PipelineModule
 import numpy as np
 import pandas as pd
 
-# 导入相关库
-
 
 class Yihuier:
-    def __init__(self, data, target=None):
-        self.data = data
-        self.target = target
-        self.eda_module = EDAModule(self)
-        self.dp_module = DataProcessingModule(self)
-        self.cluster_module = ClusterModule(self)
-        self.binning_module = BinningModule(self)
-        self.var_select_module = VarSelectModule(self)
-        self.me_module = ModelEvaluationModule(self)
-        self.si_module = ScorecardImplementModule(self)
-        self.pipeline_module = PipelineModule(self)
-        # 其他模块的初始化...
+    """评分卡建模主类
 
-    # 提取字符型变量的名字并返回一个list
-    def get_categorical_variables(self):
-        # 使用 'object' 而不是 np.object（NumPy 1.20+ 已弃用）
+    提供统一的接口来进行信用评分卡建模，包括 EDA、数据处理、
+    分箱、变量选择、模型评估和监控等功能。
+
+    Args:
+        data: 输入数据集（pandas DataFrame）
+        target: 目标变量列名，默认为 None
+
+    Attributes:
+        data: 数据集
+        target: 目标变量名
+        eda_module: 探索性数据分析模块
+        dp_module: 数据处理模块
+        cluster_module: 聚类分析模块
+        binning_module: 分箱模块
+        var_select_module: 变量选择模块
+        me_module: 模型评估模块
+        si_module: 评分卡实现模块
+        pipeline_module: 流水线模块
+    """
+
+    def __init__(self, data: pd.DataFrame, target: Optional[str] = None) -> None:
+        """初始化 Yihuier 实例
+
+        Args:
+            data: 输入数据集
+            target: 目标变量列名
+        """
+        self.data: pd.DataFrame = data
+        self.target: Optional[str] = target
+        self.eda_module: EDAModule = EDAModule(self)
+        self.dp_module: DataProcessingModule = DataProcessingModule(self)
+        self.cluster_module: ClusterModule = ClusterModule(self)
+        self.binning_module: BinningModule = BinningModule(self)
+        self.var_select_module: VarSelectModule = VarSelectModule(self)
+        self.me_module: ModelEvaluationModule = ModelEvaluationModule(self)
+        self.si_module: ScorecardImplementModule = ScorecardImplementModule(self)
+        self.pipeline_module: PipelineModule = PipelineModule(self)
+
+    def get_categorical_variables(self) -> List[str]:
+        """提取字符型/类别型变量的名字并返回列表
+
+        Returns:
+            类别型变量名称列表
+        """
         cate_vars = self.data.select_dtypes(include=['object', 'category']).columns.tolist()
 
         if self.target in cate_vars:
             cate_vars.remove(self.target)
         return cate_vars
 
-    # 提取数值型变量的名字并返回一个list
-    def get_numeric_variables(self):
-        # num_vars = list(self.data.select_dtypes(exclude='object').columns)
+    def get_numeric_variables(self) -> List[str]:
+        """提取数值型变量的名字并返回列表
+
+        Returns:
+            数值型变量名称列表
+        """
         num_vars = self.data.select_dtypes(include=[np.number]).columns.tolist()
 
         # 剔除日期型变量
@@ -49,7 +81,12 @@ class Yihuier:
             num_vars.remove(self.target)
         return num_vars
 
-    def get_date_variables(self):
+    def get_date_variables(self) -> List[str]:
+        """提取日期型变量的名字并返回列表
+
+        Returns:
+            日期型变量名称列表
+        """
         date_vars = []
 
         for col in self.data.columns:
@@ -58,7 +95,15 @@ class Yihuier:
 
         return date_vars
 
-    def __is_numeric_date_format(self, col):
+    def __is_numeric_date_format(self, col: str) -> bool:
+        """检查列是否为日期格式
+
+        Args:
+            col: 列名
+
+        Returns:
+            是否为日期格式
+        """
         if self.data[col].dropna().empty:
             return False
 

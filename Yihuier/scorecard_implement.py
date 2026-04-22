@@ -116,7 +116,7 @@ class ScorecardImplementModule:
         ax.plot(score_bin, ks_list, color='blue', label='good-bad')
         ax.set_title('KS:{:.3f}'.format(max(ks_list)))
         ax.legend(loc='best')
-        return plt.show(ax)
+        plt.show()
 
     # PR曲线
     def plot_PR(self, df, score_col, target, plt_size=None):
@@ -169,9 +169,10 @@ class ScorecardImplementModule:
         x2 = df[df[target] == 0][score_col]
         sns.kdeplot(x1, shade=True, label='坏用户', color='hotpink')
         sns.kdeplot(x2, shade=True, label='好用户', color='seagreen')
-        plt.axvline(x=cutoff)
+        if cutoff is not None:
+            plt.axvline(x=cutoff)
         plt.legend()
-        return plt.show()
+        plt.show()
 
     # 得分明细表
     def score_info(self, df, score_col, target, x=None, y=None, step=None):
