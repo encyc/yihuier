@@ -569,6 +569,6 @@ print(f"分数范围: {test_scores.min():.2f} - {test_scores.max():.2f}")
 ---
 
 更多详情请参考：
-- [模块文档](guide/modules/)
-- [示例集合](guide/examples.md)
-- [最佳实践](guide/best-practices.md)
+- [模块索引](/guide/modules/index)
+- [示例集合](/guide/examples)
+- [最佳实践](/guide/best-practices)
