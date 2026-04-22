@@ -556,6 +556,6 @@ for provider in data_sources.keys():
 
 ## 相关文档
 
-- [数据处理模块](02-data-processing.md) - 流水线中的数据清洗
-- [变量分箱模块](03-binning.md) - 流水线中的分箱操作
-- [变量选择模块](04-var-select.md) - 流水线中的特征重要性评估
+- [数据处理模块](data-processing.md) - 流水线中的数据清洗
+- [变量分箱模块](binning.md) - 流水线中的分箱操作
+- [变量选择模块](var-select.md) - 流水线中的特征重要性评估

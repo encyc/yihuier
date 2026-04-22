@@ -987,7 +987,7 @@ def calculate_score(customer_data, score_df, base_score):
 
 ## 相关文档
 
-- [变量分箱模块](03-binning.md) - 评分卡的基础
-- [变量选择模块](04-var-select.md) - 选择评分卡变量
-- [模型评估模块](05-model-evaluation.md) - 评估评分卡效果
-- [评分卡监控模块](07-scorecard-monitor.md) - 监控评分卡表现
+- [变量分箱模块](binning.md) - 评分卡的基础
+- [变量选择模块](var-select.md) - 选择评分卡变量
+- [模型评估模块](model-evaluation.md) - 评估评分卡效果
+- [评分卡监控模块](scorecard-monitor.md) - 监控评分卡表现

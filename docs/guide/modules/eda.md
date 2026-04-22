@@ -91,7 +91,7 @@ eda.plot_cate_var(
 
 #### 输出
 
-![类别型变量分布示例](images/cate_var_dist.png)
+生成类别型变量的分布柱状图，显示每个类别值的样本数量。
 
 ---
 
@@ -506,6 +506,6 @@ pip install ydata-profiling
 
 ## 相关文档
 
-- [数据处理模块](02-data-processing.md) - EDA 前的数据清洗
-- [变量分箱模块](03-binning.md) - 分箱后的 WOE 分析
-- [变量选择模块](04-var-select.md) - 基于 EDA 结果的特征选择
+- [数据处理模块](data-processing.md) - EDA 前的数据清洗
+- [变量分箱模块](binning.md) - 分箱后的 WOE 分析
+- [变量选择模块](var-select.md) - 基于 EDA 结果的特征选择

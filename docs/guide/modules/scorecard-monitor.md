@@ -643,6 +643,6 @@ for version, config in models.items():
 
 ## 相关文档
 
-- [评分卡实现模块](06-scorecard-implement.md) - 创建评分卡
-- [模型评估模块](05-model-evaluation.md) - 评估模型效果
-- [数据处理模块](02-data-processing.md) - 处理监控数据
+- [评分卡实现模块](scorecard-implement.md) - 创建评分卡
+- [模型评估模块](model-evaluation.md) - 评估模型效果
+- [数据处理模块](data-processing.md) - 处理监控数据

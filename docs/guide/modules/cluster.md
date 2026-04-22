@@ -482,6 +482,6 @@ print(cluster_analysis)
 
 ## 相关文档
 
-- [EDA模块](01-eda.md) - 聚类前的数据分析
-- [数据处理模块](02-data-processing.md) - 聚类前的数据清洗
-- [变量分箱模块](03-binning.md) - 聚类变量的分箱处理
+- [EDA模块](eda.md) - 聚类前的数据分析
+- [数据处理模块](data-processing.md) - 聚类前的数据清洗
+- [变量分箱模块](binning.md) - 聚类变量的分箱处理

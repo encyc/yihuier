@@ -642,6 +642,6 @@ print(f"标准差: {cv_scores.std():.3f}")
 
 ## 相关文档
 
-- [变量分箱模块](03-binning.md) - WOE转换是建模的基础
-- [变量选择模块](04-var-select.md) - 选择最优变量组合
-- [评分卡实现模块](06-scorecard-implement.md) - 将模型转换为评分卡
+- [变量分箱模块](binning.md) - WOE转换是建模的基础
+- [变量选择模块](var-select.md) - 选择最优变量组合
+- [评分卡实现模块](scorecard-implement.md) - 将模型转换为评分卡

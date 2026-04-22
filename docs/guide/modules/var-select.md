@@ -788,6 +788,6 @@ selected = vs.forward_delete_corr(
 
 ## 相关文档
 
-- [分箱模块](03-binning.md) - 变量选择前的WOE转换
-- [模型评估模块](05-model-evaluation.md) - 评估变量选择效果
-- [评分卡实现模块](06-scorecard-implement.md) - 使用选定变量建模
+- [分箱模块](binning.md) - 变量选择前的WOE转换
+- [模型评估模块](model-evaluation.md) - 评估变量选择效果
+- [评分卡实现模块](scorecard-implement.md) - 使用选定变量建模

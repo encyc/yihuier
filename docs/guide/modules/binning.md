@@ -823,6 +823,6 @@ new_data_woe = apply_woe(new_data, config['woe_df'])
 
 ## 相关文档
 
-- [数据处理模块](02-data-processing.md) - 分箱前的数据清洗
-- [变量选择模块](04-var-select.md) - 基于IV值的变量筛选
-- [模型评估模块](05-model-evaluation.md) - 评估分箱后的模型效果
+- [数据处理模块](data-processing.md) - 分箱前的数据清洗
+- [变量选择模块](var-select.md) - 基于IV值的变量筛选
+- [模型评估模块](model-evaluation.md) - 评估分箱后的模型效果
