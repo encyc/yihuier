@@ -44,7 +44,9 @@ export default withMermaid(defineConfig({
         },
         {
           text: '核心概念',
+          collapsed: false,
           items: [
+            { text: '概念索引', link: '/guide/concepts/index' },
             { text: 'WOE 和 IV', link: '/guide/concepts/woe-iv' },
             { text: '评分卡基础', link: '/guide/concepts/scorecard-basics' },
             { text: '评估指标', link: '/guide/concepts/evaluation-metrics' },
@@ -52,7 +54,9 @@ export default withMermaid(defineConfig({
         },
         {
           text: '功能模块',
+          collapsed: false,
           items: [
+            { text: '模块索引', link: '/guide/modules/index' },
             { text: 'EDA 模块', link: '/guide/modules/eda' },
             { text: '数据预处理', link: '/guide/modules/data-processing' },
             { text: '分箱模块', link: '/guide/modules/binning' },
@@ -68,6 +72,7 @@ export default withMermaid(defineConfig({
           text: '更多',
           items: [
             { text: '示例集合', link: '/guide/examples' },
+            { text: '高级示例', link: '/guide/advanced-examples' },
             { text: '最佳实践', link: '/guide/best-practices' },
             { text: 'API 文档', link: '/guide/api' },
           ]
@@ -77,6 +82,7 @@ export default withMermaid(defineConfig({
         {
           text: '开发者指南',
           items: [
+            { text: '开发者索引', link: '/develop/index' },
             { text: '架构设计', link: '/develop/architecture' },
             { text: '贡献指南', link: '/develop/contributing' },
             { text: '更新日志', link: '/develop/changelog' },

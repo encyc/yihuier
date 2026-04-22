@@ -339,4 +339,4 @@ A, B, base_score = yh.si_module.cal_scale(
 - 查看 [模块文档](/guide/modules)：了解各模块的详细用法
 - 阅读 [API 文档](/guide/api)：查看完整的 API 参考
 - 浏览 [示例集合](/guide/examples)：学习更多实战案例
-- 了解 [架构设计](/guide/architecture)：深入了解系统架构
+- 了解 [架构设计](/develop/architecture)：深入了解系统架构

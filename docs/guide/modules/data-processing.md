@@ -605,4 +605,3 @@ yh.data = dp.fillna_cate_var(
 
 - [EDA模块](eda.md) - 数据处理前的探索分析
 - [分箱模块](binning.md) - 数据处理后的分箱操作
-- [常量定义](../yihuier/constants.py) - 使用的特殊值常量

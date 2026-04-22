@@ -113,7 +113,7 @@ yh.me_module.plot_model_ks(y_test, y_pred)
 ### 贡献者路径
 
 1. 阅读 [贡献指南](develop/contributing.md)，了解贡献流程
-2. 查看 [开发文档](develop/)，掌握开发规范
+2. 查看 [架构设计](develop/architecture.md)，掌握开发规范
 3. Fork 项目，提交 Pull Request
 4. 参与 [Issues](https://github.com/encyc/yihuier/issues) 讨论
 
@@ -154,7 +154,6 @@ Yihuier 提供了完整的部署支持：
 - **GitHub 仓库**: https://github.com/encyc/yihuier
 - **PyPI 页面**: https://pypi.org/project/yihuier/
 - **示例数据**: [examples/data/data.csv](../examples/data/data.csv)
-- **测试报告**: [测试覆盖率报告](../test-coverage/)
 
 ## 📞 获取帮助
 
