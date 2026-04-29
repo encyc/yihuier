@@ -8,6 +8,7 @@ from yihuier.eda import EDAModule
 from yihuier.model_evaluation import ModelEvaluationModule
 from yihuier.pipeline import PipelineModule
 from yihuier.scorecard_implement import ScorecardImplementModule
+from yihuier.scorecard_monitor import ScorecardMonitorModule
 from yihuier.var_select import VarSelectModule
 
 
@@ -31,6 +32,7 @@ class Yihuier:
         var_select_module: 变量选择模块
         me_module: 模型评估模块
         si_module: 评分卡实现模块
+        sm_module: 评分卡监控模块
         pipeline_module: 流水线模块
     """
 
@@ -50,6 +52,7 @@ class Yihuier:
         self.var_select_module: VarSelectModule = VarSelectModule(self)
         self.me_module: ModelEvaluationModule = ModelEvaluationModule(self)
         self.si_module: ScorecardImplementModule = ScorecardImplementModule(self)
+        self.sm_module: ScorecardMonitorModule = ScorecardMonitorModule(self)
         self.pipeline_module: PipelineModule = PipelineModule(self)
 
     def get_categorical_variables(self) -> list[str]:

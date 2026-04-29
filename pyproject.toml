@@ -1,6 +1,6 @@
 [project]
 name = "yihuier"
-version = "0.1.0"
+version = "0.2.2"
 description = "评分卡模型实现函数模块 - 轻松解决逻辑回归建模"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -29,6 +29,7 @@ dependencies = [
     "statsmodels>=0.14.0",
     "tqdm>=4.66.1",
     "xgboost>=2.0.3",
+    "openpyxl>=3.1.5",
 ]
 
 [project.optional-dependencies]
@@ -47,13 +48,35 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/encyc/yihuier"
-Repository = "https://github.com/encyc/yihuier"
-Documentation = "https://github.com/encyc/yihuier/blob/main/README.md"
+Homepage = "https://github.com/ency/yihuier"
+Repository = "https://github.com/ency/yihuier"
+Documentation = "https://ency.github.io/yihuier/"
+Issues = "https://github.com/ency/yihuier/issues"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatchling.build]
+packages = ["yihuier"]
+include = [
+    "yihuier/**/*.py",
+    "yihuier/**/*.md",
+    "LICENSE",
+    "README.md",
+]
+
+[tool.hatchling.build.targets.wheel]
+packages = ["yihuier"]
+
+[tool.hatchling.build.targets.sdist]
+include = [
+    "/yihuier",
+    "/tests",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
 
 [tool.uv]
 dev-dependencies = []

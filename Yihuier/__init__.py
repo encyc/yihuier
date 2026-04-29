@@ -25,5 +25,5 @@ Yihuier - 评分卡模型实现函数模块
 
 from yihuier.yihuier import Yihuier
 
-__version__ = "0.1.0"
+__version__ = "0.2.2"
 __all__ = ["Yihuier"]

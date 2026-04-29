@@ -279,8 +279,8 @@ class BinningModule:
         if min_binpct > 0:
             group_values = df2["col_map"].apply(lambda x: self.__assign_bin(x, cutoffpoints))
             df2["col_map_bin"] = group_values  # 将col_map映射为对应的区间Bin
-            group_df = group_values.value_counts().to_frame()
-            group_df["bin_pct"] = group_df["col_map"] / n  # 计算每个区间的占比
+            group_df = group_values.value_counts().to_frame(name='count')
+            group_df["bin_pct"] = group_df['count'] / n  # 计算每个区间的占比
             min_pct = group_df.bin_pct.min()  # 得出最小的区间占比
             while (
                 min_pct < min_binpct and len(cutoffpoints) > 2
@@ -371,6 +371,8 @@ class BinningModule:
             # todo: ChiMerge Bug: cut point dulp
             elif method == "ChiMerge":  # 卡方
                 cut = self.__chi_merge(df, col, target, max_bin=max_bin, min_binpct=min_binpct)
+                # Fix: remove duplicates and sort cut points (monotonically increasing)
+                cut = sorted(set(cut))
                 cut.insert(0, ninf)
                 cut.append(inf)
                 bucket = pd.cut(df[col], cut)

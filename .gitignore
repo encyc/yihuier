@@ -41,3 +41,7 @@ venv.bak/
 data/*
 
 docs/node_modules
+docs/zhihu*
+
+output/
+PYPI_PUBLISHING.md

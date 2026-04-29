@@ -8,6 +8,67 @@ class ScorecardMonitorModule:
     def __init__(self, yihuier_instance) -> None:
         self.yihuier_instance = yihuier_instance
 
+    # 简化的 PSI 计算方法（直接用分数数组）
+    def calculate_psi(
+        self,
+        expected: np.ndarray | pd.Series,
+        actual: np.ndarray | pd.Series,
+        buckets: int = 10,
+        return_detail: bool = False,
+    ) -> float | pd.DataFrame:
+        """
+        计算 PSI (Population Stability Index)
+
+        Args:
+            expected: 基准分布的分数（如训练集分数）
+            actual: 对比分布的分数（如测试集/线上分数）
+            buckets: 分箱数量，默认 10
+            return_detail: 是否返回详细 PSI 表格，默认只返回总 PSI 值
+
+        Returns:
+            PSI 值（或详细 PSI 表格）
+
+        质量标准：
+            PSI < 0.1: 稳定
+            PSI 0.1-0.25: 需要监控
+            PSI > 0.25: 显著变化
+        """
+        expected = np.array(expected).flatten()
+        actual = np.array(actual).flatten()
+
+        # 基于基准分布的分箱边界
+        breakpoints = np.percentile(expected, np.arange(0, buckets + 1) / buckets * 100)
+
+        # 计算分箱计数
+        expected_counts = np.histogram(expected, bins=breakpoints)[0]
+        actual_counts = np.histogram(actual, bins=breakpoints)[0]
+
+        # 计算占比
+        expected_pct = expected_counts / len(expected)
+        actual_pct = actual_counts / len(actual)
+
+        # 处理零值
+        expected_pct = np.where(expected_pct == 0, 0.0001, expected_pct)
+        actual_pct = np.where(actual_pct == 0, 0.0001, actual_pct)
+
+        # 计算 PSI
+        psi_values = (actual_pct - expected_pct) * np.log(actual_pct / expected_pct)
+
+        if return_detail:
+            psi_df = pd.DataFrame({
+                '分箱': [f"{breakpoints[i]:.2f}-{breakpoints[i+1]:.2f}" for i in range(buckets)],
+                '基准样本数': expected_counts,
+                '基准占比': expected_pct.round(4),
+                '对比样本数': actual_counts,
+                '对比占比': actual_pct.round(4),
+                '占比差异': (actual_pct - expected_pct).round(4),
+                '分箱PSI': psi_values.round(4)
+            })
+            psi_df['总PSI'] = psi_values.sum()
+            return psi_df
+
+        return float(psi_values.sum())
+
     # 绘制变量的得分占比偏移图
     def plot_var_shift(
         self,

@@ -90,7 +90,7 @@ yh.me_module.plot_model_ks(y_test, y_pred)
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/yihuier.git
+git clone https://github.com/ency/yihuier.git
 cd yihuier
 
 # 安装开发依赖
