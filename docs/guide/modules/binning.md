@@ -155,7 +155,7 @@ binning.binning_num(
 
 #### 分箱方法
 
-**1. ChiMerge（推荐）**
+**1. ChiMerge（默认）**
 
 卡方分箱，基于卡方检验的合并策略。
 
@@ -168,7 +168,28 @@ bin_df, iv_value = binning.binning_num(
 )
 ```
 
-**2. 等频分箱（freq）**
+**2. optbinning（推荐，需可选依赖）**
+
+委托 [optbinning](https://github.com/guillermo-navas-palencia/optbinning) 的 `OptimalBinning` 用数学规划求最优切点，**默认强制 WOE 单调**（`monotonic_trend="auto"`）。切点求出后仍用本模块的统计口径，输出格式与其它方法完全一致。
+
+```bash
+pip install yihuier[optimal]
+```
+
+```python
+bin_df, iv_value = binning.binning_num(
+    col_list=['age', 'income'],
+    max_bin=10,
+    min_binpct=0.02,     # optbinning 要求 > 0，min_binpct<=0 时内部默认 0.02
+    method='optbinning'
+)
+```
+
+> **何时选 optbinning**：需要严格单调 WOE、更高 IV/KS、或自研 ChiMerge 在高基数变量上不稳时。真实数据 100 变量实测：IV 均值 +10%、WOE 单调变量 50/93（ChiMerge 仅 1/93）、成功率 100%（ChiMerge 修复后也已 100%）。
+>
+> **兼容性**：optbinning 0.20.0 未适配 scikit-learn ≥1.6（`force_all_finite` 改名），yihuier 内置运行时垫片自动处理，**无需降级 sklearn**。
+
+**3. 等频分箱（freq）**
 
 每个箱体内的样本数大致相等。
 
@@ -180,7 +201,7 @@ bin_df, iv_value = binning.binning_num(
 )
 ```
 
-**3. 等距分箱（count）**
+**4. 等距分箱（count）**
 
 每个箱体的宽度相等。
 
@@ -576,7 +597,8 @@ binning.plot_woe(
 
 | 方法 | 适用场景 | 优点 | 缺点 |
 |------|---------|------|------|
-| **ChiMerge** | 推荐默认方法 | 考虑目标变量，分箱质量高 | 速度较慢 |
+| **optbinning** | 追求最优分箱质量（需 `[optimal]`） | 数学规划求最优、强制 WOE 单调、IV/KS 更高、更稳健 | 多一个可选依赖 |
+| **ChiMerge** | 默认方法，零依赖 | 考虑目标变量，分箱质量高 | 不强制单调（需事后 `woe_monoton` 检查） |
 | **等频分箱** | 快速分析 | 速度快，每个箱样本数均衡 | 可能切分到同一类 |
 | **等距分箱** | 均匀分布的变量 | 保持变量分布特征 | 对异常值敏感 |
 | **自定义分箱** | 有业务知识 | 符合业务逻辑 | 需要领域知识 |
@@ -584,28 +606,36 @@ binning.plot_woe(
 ### 选择建议
 
 ```python
-# 1. 默认使用ChiMerge
+# 1. 追求分箱质量且已安装 [optimal]：用 optbinning（强制单调）
+binning.binning_num(
+    col_list=['age', 'income'],
+    max_bin=10,
+    min_binpct=0.02,
+    method='optbinning'
+)
+
+# 2. 零依赖默认：用 ChiMerge
 binning.binning_num(
     col_list=['age', 'income'],
     max_bin=5,
     method='ChiMerge'
 )
 
-# 2. 大数据集快速分析使用等频分箱
+# 3. 大数据集快速分析使用等频分箱
 binning.binning_num(
     col_list=num_vars,
     n=10,
     method='freq'
 )
 
-# 3. 有明确业务阈值使用自定义分箱
+# 4. 有明确业务阈值使用自定义分箱
 binning.binning_self(
     col='age',
     cut=[18, 25, 35, 45, 55, 65]
 )
 
-# 4. 多种方法对比
-for method in ['ChiMerge', 'freq', 'count']:
+# 5. 多种方法对比
+for method in ['optbinning', 'ChiMerge', 'freq', 'count']:
     _, iv_value = binning.binning_num(
         col_list=['income'],
         max_bin=5,
@@ -826,3 +856,27 @@ new_data_woe = apply_woe(new_data, config['woe_df'])
 - [数据处理模块](data-processing.md) - 分箱前的数据清洗
 - [变量选择模块](var-select.md) - 基于IV值的变量筛选
 - [模型评估模块](model-evaluation.md) - 评估分箱后的模型效果
+
+---
+
+## 变更记录与已知行为
+
+### optbinning 集成（v0.3.0+）
+
+- 新增 `method='optbinning'`，需 `pip install yihuier[optimal]`。
+- 内置运行时垫片兼容 optbinning 0.20.0 与 scikit-learn ≥1.6，无需降级 sklearn。
+- 切点由 optbinning 求解，统计口径（WOE/IV/GB_index 等）与原生方法一致，**输出格式不变**。
+
+### ChiMerge 修复（v0.2.3 / v0.3.1）
+
+历史版本 `__chi_merge` 存在若干问题，现已修复：
+
+- **v0.3.1**：修复最小占比合并循环在高基数变量上的 `IndexError`——邻箱错位（`value_counts` 计数序被误当作 Bin 自然序）、循环内未重算 `group_df`、`bin_pct` 分母误用唯一值个数。修后真实数据 100/100 变量成功。
+- **v0.2.3**：修复某箱全好/全坏时 WOE/IV 为 `inf`（`badattr`/`goodattr` 下限裁剪）；`woe_transform` 不再清零未分箱列；`binning_num_manual` 不再就地修改调用方 `cut` 列表。
+
+### 已知行为边界
+
+- `ChiMerge` 不强制 WOE 单调，需配合 `woe_monoton()` 事后检查；若需硬约束单调，改用 `method='optbinning'`。
+- `method='optbinning'` 的 `min_binpct` 要求 > 0（optbinning 约束）；传入 ≤ 0 时内部按 `0.02` 处理。
+- `method='monotonic'` 为启发式单调搜索，分箱质量不如 `optbinning`，仅在未安装可选依赖时作为退路。
+

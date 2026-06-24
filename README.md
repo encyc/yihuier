@@ -10,6 +10,7 @@
 - **完整建模流程** - EDA → 数据处理 → 分箱 → 变量选择 → 模型评估 → 评分卡实现 → 监控
 - **模块化架构** - 9个独立模块，职责清晰
 - **类型提示** - 完整的类型注解，更好的IDE支持
+- **可选 optbinning 分箱** - `pip install yihuier[optimal]` 后可用 `method='optbinning'`，强制 WOE 单调、求解器更优（真实数据上 IV 均值 +10%、单调变量 50/93 vs 自研 1/93），原生方法不受影响
 
 ## 快速开始
 
@@ -22,6 +23,17 @@ pip install yihuier
 # 或使用 uv
 uv pip install yihuier
 ```
+
+#### 可选依赖
+
+| 安装命令 | 额外能力 |
+|---------|---------|
+| `pip install yihuier[optimal]` | 启用 `method='optbinning'`——委托 [optbinning](https://github.com/guillermo-navas-palencia/optbinning) 求最优切点（强制 WOE 单调、求解器更优），内置兼容垫片，无需降级 sklearn |
+| `pip install yihuier[profiling]` | EDA 自动报告（ydata-profiling） |
+| `pip install yihuier[dev]` | 开发/测试工具（pytest、ruff） |
+| `pip install yihuier[all]` | 以上全部 |
+
+> 不安装 `[optimal]` 也能正常使用所有原生分箱方法（ChiMerge / 等频 / 等距 / 自定义）。
 
 ### 基础使用
 
