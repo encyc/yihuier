@@ -280,35 +280,51 @@ class BinningModule:
 
         # 检查分箱后的最小占比
         if min_binpct > 0:
-            group_values = df2["col_map"].apply(lambda x: self.__assign_bin(x, cutoffpoints))
-            df2["col_map_bin"] = group_values  # 将col_map映射为对应的区间Bin
-            group_df = group_values.value_counts().to_frame(name='count')
-            group_df["bin_pct"] = group_df['count'] / n  # 计算每个区间的占比
-            min_pct = group_df.bin_pct.min()  # 得出最小的区间占比
-            while (
-                min_pct < min_binpct and len(cutoffpoints) > 2
-            ):  # 当最小的区间占比小于min_pct且cutoff点的个数大于2，执行循环
-                # 下面的逻辑基本与“检验是否有箱体只有好/坏样本”的一致
-                min_pct_index = group_df[group_df.bin_pct == min_pct].index.tolist()
-                min_pct_bin = min_pct_index[0]
-                if min_pct_bin == max(group_df.index):
-                    cutoffpoints = cutoffpoints[:-1]
-                elif min_pct_bin == min(group_df.index):
+            total_n = len(df2)  # 总体样本数（min_binpct 是"占总体的最小比"）
+
+            def _bin_int(label):
+                """从 "Bin <int>" 标签取整数下标，用于按自然顺序定邻箱。"""
+                return int(str(label).split()[-1])
+
+            def _recompute_bins():
+                # 重新映射并按 Bin 自然顺序排列，保证 bins_ordered / min_pct 与 cutoffpoints 同步
+                gv = df2["col_map"].apply(
+                    lambda x, cp=cutoffpoints: self.__assign_bin(x, cp)
+                )
+                df2["col_map_bin"] = gv
+                gdf = gv.value_counts().to_frame(name="count")
+                gdf["bin_pct"] = gdf["count"] / total_n
+                return gdf, sorted(gdf.index, key=_bin_int)
+
+            group_df, bins_ordered = _recompute_bins()
+            min_pct = group_df["bin_pct"].min()
+            while min_pct < min_binpct and len(cutoffpoints) > 2:
+                # 取占比最小的箱（并列时取自然序最前者）
+                min_pct_bins = group_df[group_df["bin_pct"] == min_pct].index.tolist()
+                min_pct_bin = sorted(min_pct_bins, key=_bin_int)[0]
+                i = bins_ordered.index(min_pct_bin)
+                if i == 0:
+                    # 最左箱：与右邻合并 -> 删第一个切点
                     cutoffpoints = cutoffpoints[1:]
+                elif i == len(bins_ordered) - 1:
+                    # 最右箱：与左邻合并 -> 删最后一个切点
+                    cutoffpoints = cutoffpoints[:-1]
                 else:
-                    minpct_bin_index = list(group_df.index).index(min_pct_bin)
-                    prev_pct_bin = list(group_df.index)[minpct_bin_index - 1]
+                    prev_pct_bin = bins_ordered[i - 1]
+                    later_pct_bin = bins_ordered[i + 1]
                     df5 = df2[df2["col_map_bin"].isin([min_pct_bin, prev_pct_bin])]
-                    (dict_bad, regroup3) = self.__bin_bad_rate(df5, "col_map_bin", target)
+                    (_, regroup3) = self.__bin_bad_rate(df5, "col_map_bin", target)
                     chi3 = self.__cal_chi2(regroup3, all_bad_rate)
-                    later_pct_bin = list(group_df.index)[minpct_bin_index + 1]
                     df6 = df2[df2["col_map_bin"].isin([min_pct_bin, later_pct_bin])]
-                    (dict_bad, regroup4) = self.__bin_bad_rate(df6, "col_map_bin", target)
+                    (_, regroup4) = self.__bin_bad_rate(df6, "col_map_bin", target)
                     chi4 = self.__cal_chi2(regroup4, all_bad_rate)
+                    # 与卡方更小的邻箱合并（删两者之间的切点）
                     if chi3 < chi4:
-                        cutoffpoints.remove(cutoffpoints[minpct_bin_index - 1])
+                        cutoffpoints.remove(cutoffpoints[i - 1])
                     else:
-                        cutoffpoints.remove(cutoffpoints[minpct_bin_index])
+                        cutoffpoints.remove(cutoffpoints[i])
+                group_df, bins_ordered = _recompute_bins()
+                min_pct = group_df["bin_pct"].min()
         return cutoffpoints
 
     # 数值型变量的分箱

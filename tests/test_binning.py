@@ -157,6 +157,21 @@ def test_real_data_binning_no_inf(real_yihuier):
             assert _is_finite_iv(v), f"method={method} 出现非有限 IV: {v}"
 
 
+def test_real_data_chimerge_min_binpct_no_crash(real_yihuier):
+    """真实数据：ChiMerge + min_binpct>0 在多变量上不应 IndexError。
+
+    回归测试：__chi_merge 的最小占比合并循环此前因 (a) value_counts 计数序
+    导致邻箱错位、(b) 循环内未重算 group_df，在高基数变量上 IndexError。
+    """
+    num_cols = [c for c in real_yihuier.data.columns if c.startswith('v')]
+    _, iv_values = real_yihuier.binning_module.binning_num(
+        num_cols[:30], method='ChiMerge', max_bin=10, min_binpct=0.05
+    )
+    assert len(iv_values) == 30
+    for v in iv_values:
+        assert _is_finite_iv(v), f"ChiMerge min_binpct>0 出现非有限 IV: {v}"
+
+
 def test_real_data_woe_transform_preserves_unbinned(real_yihuier):
     """真实数据：woe_transform 不得修改未分箱的列。"""
     num_cols = [c for c in real_yihuier.data.columns if c.startswith('v')]
