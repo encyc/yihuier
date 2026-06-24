@@ -6,6 +6,9 @@ import pandas as pd
 import seaborn as sns
 from scipy.stats import spearmanr
 
+# 防止某箱全好/全坏（badattr/goodattr 为 0）导致 WOE = log(0) 出现 ±inf
+_WOE_EPSILON = 1e-8
+
 
 class BinningModule:
     def __init__(self, yihuier_instance) -> None:
@@ -41,8 +44,8 @@ class BinningModule:
             d2["badrate"] = d2["bad"] / d2["total"]
             d2["good"] = d2["total"] - d2["bad"]
             d2["goodrate"] = d2["good"] / d2["total"]
-            d2["badattr"] = d2["bad"] / bad
-            d2["goodattr"] = d2["good"] / good
+            d2["badattr"] = (d2["bad"] / bad).clip(lower=_WOE_EPSILON)
+            d2["goodattr"] = (d2["good"] / good).clip(lower=_WOE_EPSILON)
             d2["cumgoodrate"] = (d2["goodrate"] * d2["totalrate"] / (good / total)).cumsum()
             d2["cumbadrate"] = (d2["badrate"] * d2["totalrate"] / (bad / total)).cumsum()
             d2["odds"] = d2["good"] / d2["bad"]
@@ -358,16 +361,19 @@ class BinningModule:
             #     cut = sc.binning_function.get_cart_bincut(df, col, target, leaf_stop_percent=leaf_stop_percent)
             #     bucket = pd.cut(df[col],cut)
             elif method == "monotonic":
+                # 通过逐步增加分箱数寻找 WOE 单调的分箱方案；
+                # 上限 n_max 防止 qcut 因分箱数超过唯一值数量而报错或死循环。
+                n_max = max(n + 1, min(df[col].nunique(), 100))
                 r = 0
-                while np.abs(r) < 1:
+                cur_n = n
+                while np.abs(r) < 1 and cur_n < n_max:
                     d_1 = pd.DataFrame(
-                        {"col": df[col], "target": df[target], "bin": pd.qcut(df[col], n)}
+                        {"col": df[col], "target": df[target], "bin": pd.qcut(df[col], cur_n)}
                     )
                     d_2 = d_1.groupby("bin", as_index=True)
-                    r, p = spearmanr(d_2["col"].mean(), d_2["target"].mean())
-                    n = n + 1
-                bucket = pd.qcut(df[col], n - 1)
-                print(bucket)
+                    r, _ = spearmanr(d_2["col"].mean(), d_2["target"].mean())
+                    cur_n = cur_n + 1
+                bucket = pd.qcut(df[col], cur_n - 1)
             # todo: ChiMerge Bug: cut point dulp
             elif method == "ChiMerge":  # 卡方
                 cut = self.__chi_merge(df, col, target, max_bin=max_bin, min_binpct=min_binpct)
@@ -388,8 +394,8 @@ class BinningModule:
             d2["badrate"] = d2["bad"] / d2["total"]
             d2["good"] = d2["total"] - d2["bad"]
             d2["goodrate"] = d2["good"] / d2["total"]
-            d2["badattr"] = d2["bad"] / bad
-            d2["goodattr"] = (d2["total"] - d2["bad"]) / good
+            d2["badattr"] = (d2["bad"] / bad).clip(lower=_WOE_EPSILON)
+            d2["goodattr"] = ((d2["total"] - d2["bad"]) / good).clip(lower=_WOE_EPSILON)
             d2["cumgoodrate"] = (d2["goodrate"] * d2["totalrate"] / (good / total)).cumsum()
             d2["cumbadrate"] = (d2["badrate"] * d2["totalrate"] / (bad / total)).cumsum()
             d2["odds"] = d2["good"] / d2["bad"]
@@ -460,7 +466,7 @@ class BinningModule:
         iv_value = []
 
         col = col
-        cut = cut
+        cut = list(cut)  # 复制，避免就地修改调用方传入的 list
         cut.insert(0, ninf)
         cut.append(inf)
         bucket = pd.cut(df[col], cut)
@@ -474,8 +480,8 @@ class BinningModule:
         d2["badrate"] = d2["bad"] / d2["total"]
         d2["good"] = d2["total"] - d2["bad"]
         d2["goodrate"] = d2["good"] / d2["total"]
-        d2["badattr"] = d2["bad"] / bad
-        d2["goodattr"] = (d2["total"] - d2["bad"]) / good
+        d2["badattr"] = (d2["bad"] / bad).clip(lower=_WOE_EPSILON)
+        d2["goodattr"] = ((d2["total"] - d2["bad"]) / good).clip(lower=_WOE_EPSILON)
         d2["cumgoodrate"] = (d2["goodrate"] * d2["totalrate"] / (good / total)).cumsum()
         d2["cumbadrate"] = (d2["badrate"] * d2["totalrate"] / (bad / total)).cumsum()
         d2["odds"] = d2["good"] / d2["bad"]
@@ -532,8 +538,8 @@ class BinningModule:
         d2["badrate"] = d2["bad"] / d2["total"]
         d2["good"] = d2["total"] - d2["bad"]
         d2["goodrate"] = d2["good"] / d2["total"]
-        d2["badattr"] = d2["bad"] / bad
-        d2["goodattr"] = (d2["total"] - d2["bad"]) / good
+        d2["badattr"] = (d2["bad"] / bad).clip(lower=_WOE_EPSILON)
+        d2["goodattr"] = ((d2["total"] - d2["bad"]) / good).clip(lower=_WOE_EPSILON)
         d2["odds"] = d2["good"] / d2["bad"]
         GB_list = []
         for i in d2.odds:
@@ -602,7 +608,12 @@ class BinningModule:
         col_list = []
         woe_judge = []
         for woe_df in bin_df:
-            col_name = woe_df.index.name
+            # binning_cate 的列名在 index.name；binning_num reset_index 后在首列。
+            col_name = (
+                woe_df.index.name
+                if woe_df.index.name is not None
+                else woe_df.columns[0]
+            )
             woe_list = list(woe_df.woe)
             if woe_df.shape[0] == 2:
                 # print('{}是否单调: True'.format(col_name))
@@ -641,7 +652,12 @@ class BinningModule:
         col_list = []
         woe_judge = []
         for woe_df in bin_df:
-            col_name = woe_df.index.name
+            # binning_cate 的列名在 index.name；binning_num reset_index 后在首列。
+            col_name = (
+                woe_df.index.name
+                if woe_df.index.name is not None
+                else woe_df.columns[0]
+            )
             woe_list = list(woe_df.woe)
             woe_large = list(filter(lambda x: x >= 1, woe_list))
             if len(woe_large) > 0:
@@ -694,9 +710,10 @@ class BinningModule:
         df2 = self.yihuier_instance.data.copy()
         target = self.yihuier_instance.target
         df_woe = self.woe_result_df
-        print(df2.drop([target], axis=1))
 
-        for col in df2.drop([target], axis=1).columns:
+        # 仅对已分箱的变量进行 WOE 转换；未分箱的列保持原值，避免被错误地清零。
+        binned_cols = [c for c in df_woe["col"].unique() if c in df2.columns and c != target]
+        for col in binned_cols:
             x = df2[col]
             bin_map = df_woe[df_woe.col == col]
             bin_res = np.array([0] * x.shape[0], dtype=float)

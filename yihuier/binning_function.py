@@ -118,7 +118,7 @@ def get_cart_split_point(data, var, target, min_sample):
             if len(median_list) > 1:
                 BestSplit_Position = i / (len(median_list) - 1)
             else:
-                BestSplit_Position = i / len(len(median_list))
+                BestSplit_Position = i / len(median_list)
         else:
             continue
     Gini = Gini - Best_Gini
