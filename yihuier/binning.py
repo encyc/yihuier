@@ -382,6 +382,31 @@ class BinningModule:
                 cut.insert(0, ninf)
                 cut.append(inf)
                 bucket = pd.cut(df[col], cut)
+            elif method == "optbinning":  # 委托 optbinning 求切点（需 pip install yihuier[optimal]）
+                # 先注册兼容垫片：optbinning 0.20.0 未适配 sklearn>=1.6（force_all_finite 改名），
+                # 必须在 import optbinning 之前导入。
+                import yihuier._optbinning_compat  # noqa: F401
+                try:
+                    from optbinning import OptimalBinning
+                except ImportError as e:
+                    raise ImportError(
+                        "method='optbinning' 需要 optbinning，请运行: pip install yihuier[optimal]"
+                    ) from e
+                # optbinning 要求 min_bin_size 在 (0, 0.5]，min_binpct<=0 时给一个合理默认值
+                min_bin_size = min_binpct if min_binpct and min_binpct > 0 else 0.02
+                ob = OptimalBinning(
+                    name=col,
+                    dtype="numerical",
+                    solver="cp",
+                    max_n_bins=max_bin,
+                    min_bin_size=min_bin_size,
+                    monotonic_trend="auto",  # 自动判断单调方向并作为硬约束
+                )
+                ob.fit(df[col].values, df[target].values)
+                cut = sorted(set(float(s) for s in ob.splits))
+                cut.insert(0, ninf)
+                cut.append(inf)
+                bucket = pd.cut(df[col], cut)
 
             # Create d1 for all methods
             d1 = df.groupby(bucket)
