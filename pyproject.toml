@@ -43,8 +43,12 @@ profiling = [
     "ydata-profiling>=4.6.0",
 ]
 
+optimal = [
+    "optbinning>=0.20.0",
+]
+
 all = [
-    "yihuier[dev,profiling]",
+    "yihuier[dev,profiling,optimal]",
 ]
 
 [project.urls]
