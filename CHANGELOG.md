@@ -5,6 +5,30 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.0] - 2026-07-14
+
+### 新增
+- 🎯 **特征工程模块（FeatureEngineeringModule）**：评分卡场景的宽表特征衍生
+  - 交叉特征：`gen_ratio()`（比率）、`gen_sum()`（求和）、`gen_diff()`（差分）、`gen_cross()`（通用四则运算）
+  - 数学变换：`gen_transform()`，支持 log/log1p/sqrt/square/abs/reciprocal，非正值自动转 NaN
+  - 缺失指示符：`gen_missing_flag()`，每列独立生成 0/1 flag，应在 fillna 之前调用
+  - 批量交叉 + IV 预筛：`batch_cross()`，自动两两组合并复用 `binning_module.iv_num` 过滤低 IV 特征
+  - Yihuier 类新增 `fe_module` 属性，位于流程中 dp_module 之后、binning_module 之前
+  - 36 个单元测试覆盖所有函数（happy path + 边界：除零、负数、缺失、非法参数）
+
+## [0.3.0] - 2026-05-XX
+
+### 新增
+- 集成 [optbinning](https://github.com/guillermo-navas-palencia/optbinning) 作为可选分箱方法
+  - `pip install yihuier[optimal]` 后可用 `method='optbinning'`
+  - 强制 WOE 单调、求解器更优（真实数据上 IV 均值 +10%、单调变量 50/93 vs 自研 1/93）
+  - 内置兼容垫片，无需降级 sklearn
+
+## [0.2.3] - 2026-04-XX
+
+### 修复
+- 修复 ChiMerge 最小占比合并循环的 IndexError
+
 ## [0.2.2] - 2026-04-29
 
 ### 修复
@@ -114,7 +138,6 @@
 
 ### 计划中
 - 更多分箱方法（决策树分箱、最优分箱）
-- 自动化特征工程模块
 - 模型对比和自动选择
 - 更多评估指标和可视化
 - GPU 加速支持
