@@ -1,0 +1,25 @@
+{
+  "name": "yihuier",
+  "owner": {
+    "name": "Justin Gao",
+    "url": "https://github.com/encyc"
+  },
+  "metadata": {
+    "description": "Yihuier 信用评分卡建模 skill",
+    "version": "0.4.0"
+  },
+  "plugins": [
+    {
+      "name": "yihuier",
+      "description": "信用评分卡建模全流程 skill。EDA → 特征工程 → 分箱 → 变量选择 → 建模 → 评估 → 评分卡 → 监控。质量标准：AUC≥0.65, KS≥0.15, PSI<0.25。",
+      "version": "0.4.0",
+      "author": {
+        "name": "Justin Gao",
+        "url": "https://github.com/encyc"
+      },
+      "homepage": "https://github.com/encyc/yihuier",
+      "tags": ["credit-scoring", "risk-modeling", "scorecard", "woe", "binning"],
+      "source": "./"
+    }
+  ]
+}

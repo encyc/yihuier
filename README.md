@@ -15,6 +15,33 @@
 
 ## 快速开始
 
+### 安装 Skill（可选）
+
+让你的 AI 编程助手自动掌握 yihuier 评分卡建模全流程：
+
+**Claude Code / ZCode**（在会话中运行）：
+
+```
+/plugin marketplace add encyc/yihuier
+/plugin install yihuier@yihuier
+```
+
+或命令行：
+
+```bash
+claude plugin marketplace add encyc/yihuier
+claude plugin install yihuier@yihuier
+```
+
+**Codex**：
+
+```bash
+codex plugin marketplace add encyc/yihuier
+codex plugin install yihuier@yihuier
+```
+
+安装后，助手会自动识别风控建模需求并引导完成 10 步建模流程。
+
 ### 安装
 
 ```bash

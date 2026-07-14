@@ -1,0 +1,13 @@
+{
+  "name": "yihuier",
+  "version": "0.4.0",
+  "description": "信用评分卡建模全流程 skill",
+  "author": {
+    "name": "Justin Gao",
+    "url": "https://github.com/encyc"
+  },
+  "homepage": "https://github.com/encyc/yihuier",
+  "repository": "https://github.com/encyc/yihuier",
+  "license": "MIT",
+  "keywords": ["credit-scoring", "risk-modeling", "scorecard"]
+}
