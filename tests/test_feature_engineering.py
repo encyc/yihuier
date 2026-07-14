@@ -107,3 +107,71 @@ def test_gen_cross_logs_feature(yihuier_instance):
     entry = [e for e in log if e['name'] == 'v1_plus_v2'][0]
     assert entry['source'] == ('v1', 'v2')
     assert entry['method'] == 'cross:+'
+
+
+def test_gen_ratio(yihuier_instance):
+    """测试比率特征"""
+    result = yihuier_instance.fe_module.gen_ratio('v1', 'v2', 'ratio_v1_v2')
+    assert 'ratio_v1_v2' in result.columns
+    mask = yihuier_instance.data['v1'].notna()
+    expected = yihuier_instance.data.loc[mask, 'v1'] / yihuier_instance.data.loc[mask, 'v2']
+    pd.testing.assert_series_equal(
+        result.loc[mask, 'ratio_v1_v2'].reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gen_ratio_divide_by_zero():
+    """测试比率除零 → NaN"""
+    from yihuier.yihuier import Yihuier
+    data = pd.DataFrame({'target': [0, 1], 'a': [10.0, 20.0], 'b': [0.0, 5.0]})
+    yh = Yihuier(data, 'target')
+    result = yh.fe_module.gen_ratio('a', 'b', 'a_over_b')
+    assert pd.isna(result.loc[0, 'a_over_b'])
+    assert result.loc[1, 'a_over_b'] == 4.0
+
+
+def test_gen_sum(yihuier_instance):
+    """测试多列求和"""
+    result = yihuier_instance.fe_module.gen_sum(['v1', 'v2', 'v4'], 'sum_v124')
+    assert 'sum_v124' in result.columns
+    mask = yihuier_instance.data['v1'].notna()
+    expected = (
+        yihuier_instance.data.loc[mask, 'v1']
+        + yihuier_instance.data.loc[mask, 'v2']
+        + yihuier_instance.data.loc[mask, 'v4']
+    )
+    pd.testing.assert_series_equal(
+        result.loc[mask, 'sum_v124'].reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gen_sum_single_column(yihuier_instance):
+    """测试单列求和（等于原列复制）"""
+    result = yihuier_instance.fe_module.gen_sum(['v1'], 'sum_v1')
+    assert 'sum_v1' in result.columns
+
+
+def test_gen_diff(yihuier_instance):
+    """测试差分"""
+    result = yihuier_instance.fe_module.gen_diff('v1', 'v2', 'diff_v1_v2')
+    assert 'diff_v1_v2' in result.columns
+    mask = yihuier_instance.data['v1'].notna()
+    expected = yihuier_instance.data.loc[mask, 'v1'] - yihuier_instance.data.loc[mask, 'v2']
+    pd.testing.assert_series_equal(
+        result.loc[mask, 'diff_v1_v2'].reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gen_shortcuts_log_features(yihuier_instance):
+    """测试快捷函数记录 feature_log"""
+    yihuier_instance.fe_module.gen_ratio('v1', 'v2', 'r')
+    yihuier_instance.fe_module.gen_sum(['v1', 'v2'], 's')
+    yihuier_instance.fe_module.gen_diff('v1', 'v2', 'd')
+    names = [e['name'] for e in yihuier_instance.fe_module.feature_log]
+    assert 'r' in names and 's' in names and 'd' in names
