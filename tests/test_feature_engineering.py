@@ -175,3 +175,83 @@ def test_gen_shortcuts_log_features(yihuier_instance):
     yihuier_instance.fe_module.gen_diff('v1', 'v2', 'd')
     names = [e['name'] for e in yihuier_instance.fe_module.feature_log]
     assert 'r' in names and 's' in names and 'd' in names
+
+
+def test_gen_transform_log1p(yihuier_instance):
+    """测试 log1p 变换"""
+    result = yihuier_instance.fe_module.gen_transform('v2', 'log1p', 'v2_log1p')
+    assert 'v2_log1p' in result.columns
+    mask = yihuier_instance.data['v2'].notna() & (yihuier_instance.data['v2'] > -1)
+    expected = np.log1p(yihuier_instance.data.loc[mask, 'v2'])
+    pd.testing.assert_series_equal(
+        result.loc[mask, 'v2_log1p'].reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gen_transform_square(yihuier_instance):
+    """测试 square 变换"""
+    result = yihuier_instance.fe_module.gen_transform('v2', 'square', 'v2_sq')
+    assert 'v2_sq' in result.columns
+    mask = yihuier_instance.data['v2'].notna()
+    expected = yihuier_instance.data.loc[mask, 'v2'] ** 2
+    pd.testing.assert_series_equal(
+        result.loc[mask, 'v2_sq'].reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gen_transform_abs(yihuier_instance):
+    """测试 abs 变换"""
+    result = yihuier_instance.fe_module.gen_transform('v2', 'abs', 'v2_abs')
+    assert 'v2_abs' in result.columns
+    mask = yihuier_instance.data['v2'].notna()
+    expected = yihuier_instance.data.loc[mask, 'v2'].abs()
+    pd.testing.assert_series_equal(
+        result.loc[mask, 'v2_abs'].reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
+
+
+def test_gen_transform_sqrt_negative_returns_nan():
+    """测试 sqrt 对负数返回 NaN"""
+    from yihuier.yihuier import Yihuier
+    data = pd.DataFrame({'target': [0, 1, 0], 'x': [4.0, -1.0, 9.0]})
+    yh = Yihuier(data, 'target')
+    result = yh.fe_module.gen_transform('x', 'sqrt', 'x_sqrt')
+    assert result.loc[0, 'x_sqrt'] == 2.0
+    assert pd.isna(result.loc[1, 'x_sqrt'])  # 负数 → NaN
+    assert result.loc[2, 'x_sqrt'] == 3.0
+
+
+def test_gen_transform_log_nonpositive_returns_nan():
+    """测试 log 对零/负数返回 NaN"""
+    from yihuier.yihuier import Yihuier
+    data = pd.DataFrame({'target': [0, 1, 0], 'x': [1.0, 0.0, -2.0]})
+    yh = Yihuier(data, 'target')
+    result = yh.fe_module.gen_transform('x', 'log', 'x_log')
+    assert result.loc[0, 'x_log'] == 0.0  # log(1) = 0
+    assert pd.isna(result.loc[1, 'x_log'])  # log(0) → NaN
+    assert pd.isna(result.loc[2, 'x_log'])  # log(-2) → NaN
+
+
+def test_gen_transform_invalid_method(yihuier_instance):
+    """测试非法 method 抛 ValueError"""
+    with pytest.raises(ValueError, match="不支持的变换方法"):
+        yihuier_instance.fe_module.gen_transform('v1', 'cube', 'v1_cube')
+
+
+def test_gen_transform_reciprocal(yihuier_instance):
+    """测试倒数变换"""
+    result = yihuier_instance.fe_module.gen_transform('v2', 'reciprocal', 'v2_rec')
+    assert 'v2_rec' in result.columns
+    mask = yihuier_instance.data['v2'].notna() & (yihuier_instance.data['v2'] != 0)
+    expected = 1.0 / yihuier_instance.data.loc[mask, 'v2']
+    pd.testing.assert_series_equal(
+        result.loc[mask, 'v2_rec'].reset_index(drop=True),
+        expected.reset_index(drop=True),
+        check_names=False,
+    )
