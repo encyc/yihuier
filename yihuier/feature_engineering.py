@@ -31,9 +31,7 @@ class FeatureEngineeringModule:
         self.yihuier_instance = yihuier_instance
         self.feature_log: list[dict] = []
 
-    def gen_cross(
-        self, a: str, b: str, op: str, name: str
-    ) -> pd.DataFrame:
+    def gen_cross(self, a: str, b: str, op: str, name: str) -> pd.DataFrame:
         """通用四则运算交叉特征
 
         Args:
@@ -153,7 +151,7 @@ class FeatureEngineeringModule:
             result = pd.Series(np.nan, index=s.index, dtype=float)
             result[valid] = np.sqrt(s[valid])
         elif method == "square":
-            result = s ** 2
+            result = s**2
         elif method == "abs":
             result = s.abs()
         elif method == "reciprocal":
@@ -167,9 +165,7 @@ class FeatureEngineeringModule:
         self.feature_log.append({"name": name, "source": col, "method": f"transform:{method}"})
         return data
 
-    def gen_missing_flag(
-        self, cols: list[str], prefix: str = "miss_"
-    ) -> pd.DataFrame:
+    def gen_missing_flag(self, cols: list[str], prefix: str = "miss_") -> pd.DataFrame:
         """缺失指示符
 
         对每列生成独立的 0/1 flag 列：缺失=1，非缺失=0。
@@ -186,9 +182,7 @@ class FeatureEngineeringModule:
         for col in cols:
             flag_name = f"{prefix}{col}"
             data[flag_name] = data[col].isna().astype(int)
-            self.feature_log.append(
-                {"name": flag_name, "source": col, "method": "missing_flag"}
-            )
+            self.feature_log.append({"name": flag_name, "source": col, "method": "missing_flag"})
         return data
 
     def batch_cross(
@@ -239,13 +233,9 @@ class FeatureEngineeringModule:
                     elif op == "/":
                         # 除零 → NaN（与 gen_cross/gen_ratio 一致）
                         with np.errstate(divide="ignore", invalid="ignore"):
-                            temp_data[feat_name] = temp_data[a] / temp_data[b].replace(
-                                0, np.nan
-                            )
+                            temp_data[feat_name] = temp_data[a] / temp_data[b].replace(0, np.nan)
                     else:
-                        raise ValueError(
-                            f"不支持的运算符: {op}。必须是 '+', '-', '*', '/' 之一"
-                        )
+                        raise ValueError(f"不支持的运算符: {op}。必须是 '+', '-', '*', '/' 之一")
                     candidates.append(feat_name)
                     self.feature_log.append(
                         {"name": feat_name, "source": (a, b), "method": f"batch_cross:{op}"}
@@ -259,9 +249,7 @@ class FeatureEngineeringModule:
         original_data = self.yihuier_instance.data
         self.yihuier_instance.data = temp_data
         try:
-            iv_df = self.yihuier_instance.binning_module.iv_num(
-                candidates, method="freq", n=10
-            )
+            iv_df = self.yihuier_instance.binning_module.iv_num(candidates, method="freq", n=10)
         finally:
             self.yihuier_instance.data = original_data
         # iv_df 列: ['col', 'iv']
