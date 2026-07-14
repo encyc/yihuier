@@ -42,6 +42,29 @@ yh.data = yh.dp_module.fillna_num_var(numeric_vars, fill_type='0')
 yh.data = yh.dp_module.target_missing_delete()
 ```
 
+### 第 2.5 步：特征工程（可选）
+
+```python
+# 交叉特征（评分卡常用：负债比、利用率等）
+yh.data = yh.fe_module.gen_ratio('debt', 'income', name='dti')
+yh.data = yh.fe_module.gen_diff('balance', 'limit', name='net_balance')
+
+# 数学变换（处理偏态变量）
+yh.data = yh.fe_module.gen_transform('income', method='log1p', name='income_log')
+
+# 缺失指示符（在 fillna 之前调用）
+yh.data = yh.fe_module.gen_missing_flag(['income', 'age'])
+# → 新增 miss_income、miss_age 两列
+
+# 批量交叉 + IV 预筛
+yh.data = yh.fe_module.batch_cross(
+    col_list=['income', 'debt', 'balance', 'limit'],
+    ops=['/', '-'],
+    iv_threshold=0.02,
+    max_features=50
+)
+```
+
 ### 第 3 步：变量分箱
 
 ```python
@@ -166,6 +189,7 @@ for var in final_vars:
 |------|------|----------|
 | `eda_module` | 数据探索 | `auto_eda_simple()` |
 | `dp_module` | 数据处理 | `fillna_num_var()`, `target_missing_delete()` |
+| `fe_module` | 特征工程 | `gen_ratio()`, `gen_cross()`, `batch_cross()` |
 | `binning_module` | 分箱 | `binning_num()`, `woe_df_concat()`, `woe_transform()` |
 | `var_select_module` | 变量选择 | `forward_delete_corr_ivfirst()` |
 | `me_module` | 模型评估 | `model_ks()`, `cross_verify()` |

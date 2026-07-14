@@ -8,6 +8,7 @@
 
 - **面向对象设计** - 统一的 Yihuier 类管理数据和状态
 - **完整建模流程** - EDA → 数据处理 → 分箱 → 变量选择 → 模型评估 → 评分卡实现 → 监控
+- **特征工程** - 交叉特征、数学变换、缺失指示符、批量交叉（带 IV 预筛）
 - **模块化架构** - 9个独立模块，职责清晰
 - **类型提示** - 完整的类型注解，更好的IDE支持
 - **可选 optbinning 分箱** - `pip install yihuier[optimal]` 后可用 `method='optbinning'`，强制 WOE 单调、求解器更优（真实数据上 IV 均值 +10%、单调变量 50/93 vs 自研 1/93），原生方法不受影响
@@ -82,6 +83,7 @@ yh.me_module.plot_model_ks(y_test, y_pred)
 |------|------|------|
 | `EDAModule` | 探索性数据分析 | [📖 EDA 模块](https://encyc.github.io/yihuier/guide/modules/eda.html) |
 | `DataProcessingModule` | 数据预处理 | [📖 数据预处理](https://encyc.github.io/yihuier/guide/modules/data-processing.html) |
+| `FeatureEngineeringModule` | 特征工程 | [📖 特征工程模块](https://encyc.github.io/yihuier/guide/modules/feature-engineering.html) |
 | `BinningModule` | 变量分箱 | [📖 分箱模块](https://encyc.github.io/yihuier/guide/modules/binning.html) |
 | `VarSelectModule` | 变量选择 | [📖 变量选择](https://encyc.github.io/yihuier/guide/modules/var-select.html) |
 | `ModelEvaluationModule` | 模型评估 | [📖 模型评估](https://encyc.github.io/yihuier/guide/modules/model-evaluation.html) |
