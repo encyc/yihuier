@@ -306,3 +306,110 @@ def test_gen_missing_flag_logs_features(yihuier_instance):
     names = [e['name'] for e in yihuier_instance.fe_module.feature_log]
     assert 'miss_v1' in names
     assert 'miss_v2' in names
+
+
+def test_batch_cross_generates_features(yihuier_instance):
+    """测试 batch_cross 生成特征并追加到返回的 DataFrame"""
+    result = yihuier_instance.fe_module.batch_cross(
+        col_list=['v1', 'v2', 'v4'],
+        ops=['/', '-'],
+        iv_threshold=0.0,  # 不过滤，验证全部生成
+        max_features=100,
+    )
+    # 3 列两两组合 = 3 对，× 2 ops = 6 个特征
+    new_cols = [c for c in result.columns if c.startswith('fe_')]
+    assert len(new_cols) == 6
+
+
+def test_batch_cross_iv_filter(yihuier_instance):
+    """测试 IV 预筛：iv_threshold 较高时特征数减少"""
+    # 用一个很高的阈值，大部分随机特征 IV 接近 0
+    result_strict = yihuier_instance.fe_module.batch_cross(
+        col_list=['v1', 'v2', 'v4'],
+        ops=['/', '-'],
+        iv_threshold=0.5,  # 极高阈值
+        max_features=100,
+    )
+    new_cols_strict = [c for c in result_strict.columns if c.startswith('fe_')]
+    # 随机数据 IV 很难超过 0.5，应被大量过滤
+    assert len(new_cols_strict) < 6
+
+    # 对照：阈值 0 不过滤
+    result_loose = yihuier_instance.fe_module.batch_cross(
+        col_list=['v1', 'v2', 'v4'],
+        ops=['/', '-'],
+        iv_threshold=0.0,
+        max_features=100,
+    )
+    new_cols_loose = [c for c in result_loose.columns if c.startswith('fe_')]
+    assert len(new_cols_strict) <= len(new_cols_loose)
+
+
+def test_batch_cross_max_features_cap(yihuier_instance):
+    """测试 max_features 截断"""
+    result = yihuier_instance.fe_module.batch_cross(
+        col_list=['v1', 'v2', 'v4'],
+        ops=['/', '-', '+', '*'],  # 3 对 × 4 = 12 个候选
+        iv_threshold=0.0,
+        max_features=3,  # 只保留 3 个
+    )
+    new_cols = [c for c in result.columns if c.startswith('fe_')]
+    assert len(new_cols) == 3
+
+
+def test_batch_cross_naming(yihuier_instance):
+    """测试命名规则：{prefix}{a}_{opname}_{b}"""
+    result = yihuier_instance.fe_module.batch_cross(
+        col_list=['v1', 'v2'],
+        ops=['/', '-'],
+        iv_threshold=0.0,
+        max_features=100,
+        prefix='fe_',
+    )
+    assert 'fe_v1_div_v2' in result.columns
+    assert 'fe_v1_sub_v2' in result.columns
+
+
+def test_batch_cross_no_mutation(yihuier_instance):
+    """测试不修改 yh.data"""
+    original_cols = list(yihuier_instance.data.columns)
+    yihuier_instance.fe_module.batch_cross(
+        col_list=['v1', 'v2'],
+        ops=['/'],
+        iv_threshold=0.0,
+        max_features=100,
+    )
+    assert list(yihuier_instance.data.columns) == original_cols
+
+
+def test_batch_cross_divide_by_zero_safe():
+    """测试含除零的特征不崩溃"""
+    from yihuier.yihuier import Yihuier
+    data = pd.DataFrame({
+        'target': [0, 1, 0, 1],
+        'a': [10.0, 20.0, 0.0, 5.0],
+        'b': [0.0, 5.0, 0.0, 1.0],
+    })
+    yh = Yihuier(data, 'target')
+    # 不应抛异常
+    result = yh.fe_module.batch_cross(
+        col_list=['a', 'b'],
+        ops=['/'],
+        iv_threshold=0.0,
+        max_features=100,
+    )
+    # 特征列存在即可
+    assert 'fe_a_div_b' in result.columns
+
+
+def test_batch_cross_custom_prefix(yihuier_instance):
+    """测试自定义前缀"""
+    result = yihuier_instance.fe_module.batch_cross(
+        col_list=['v1', 'v2'],
+        ops=['-'],
+        iv_threshold=0.0,
+        max_features=100,
+        prefix='cross_',
+    )
+    assert 'cross_v1_sub_v2' in result.columns
+    assert len([c for c in result.columns if c.startswith('cross_')]) == 1

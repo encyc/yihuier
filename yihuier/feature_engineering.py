@@ -190,3 +190,89 @@ class FeatureEngineeringModule:
                 {"name": flag_name, "source": col, "method": "missing_flag"}
             )
         return data
+
+    def batch_cross(
+        self,
+        col_list: list[str],
+        ops: list[str] = None,
+        iv_threshold: float = 0.02,
+        max_features: int = 50,
+        prefix: str = "fe_",
+    ) -> pd.DataFrame:
+        """批量交叉特征 + IV 预筛
+
+        对 col_list 做有序两两组合 × ops，生成交叉特征，
+        然后用 IV 过滤，保留有区分力的特征。
+
+        Args:
+            col_list: 参与交叉的列名列表
+            ops: 运算符列表，默认 ['/', '-']
+            iv_threshold: IV 下限，低于此值的特征被丢弃
+            max_features: 最多保留的特征数（按 IV 降序）
+            prefix: 新特征列名前缀
+
+        Returns:
+            原始数据 + 筛选后新特征列的 DataFrame（副本）
+        """
+        if ops is None:
+            ops = ["/", "-"]
+
+        op_names = {"+": "add", "-": "sub", "*": "mul", "/": "div"}
+
+        # 1. 生成所有候选特征
+        candidates = []  # [feature_name, ...]
+        temp_data = self.yihuier_instance.data.copy()
+
+        n = len(col_list)
+        for i in range(n):
+            for j in range(i + 1, n):
+                a, b = col_list[i], col_list[j]
+                for op in ops:
+                    feat_name = f"{prefix}{a}_{op_names[op]}_{b}"
+                    # 复用 gen_cross 的运算逻辑，在 temp_data 上累加
+                    if op == "+":
+                        temp_data[feat_name] = temp_data[a] + temp_data[b]
+                    elif op == "-":
+                        temp_data[feat_name] = temp_data[a] - temp_data[b]
+                    elif op == "*":
+                        temp_data[feat_name] = temp_data[a] * temp_data[b]
+                    elif op == "/":
+                        # 除零 → NaN（与 gen_cross/gen_ratio 一致）
+                        with np.errstate(divide="ignore", invalid="ignore"):
+                            temp_data[feat_name] = temp_data[a] / temp_data[b].replace(
+                                0, np.nan
+                            )
+                    else:
+                        raise ValueError(
+                            f"不支持的运算符: {op}。必须是 '+', '-', '*', '/' 之一"
+                        )
+                    candidates.append(feat_name)
+                    self.feature_log.append(
+                        {"name": feat_name, "source": (a, b), "method": f"batch_cross:{op}"}
+                    )
+
+        if not candidates:
+            return self.yihuier_instance.data.copy()
+
+        # 2. IV 预筛：复用 binning_module.iv_num（等频分箱，快速）
+        # iv_num 从 yh.data 读取，需临时替换为含候选特征的 temp_data
+        original_data = self.yihuier_instance.data
+        self.yihuier_instance.data = temp_data
+        try:
+            iv_df = self.yihuier_instance.binning_module.iv_num(
+                candidates, method="freq", n=10
+            )
+        finally:
+            self.yihuier_instance.data = original_data
+        # iv_df 列: ['col', 'iv']
+
+        # 3. 过滤 + 截断
+        iv_df = iv_df[iv_df["iv"] >= iv_threshold]
+        iv_df = iv_df.sort_values("iv", ascending=False).reset_index(drop=True)
+        kept = iv_df["col"].head(max_features).tolist()
+
+        # 4. 返回原始数据 + 保留的特征列
+        result = self.yihuier_instance.data.copy()
+        for feat in kept:
+            result[feat] = temp_data[feat]
+        return result
