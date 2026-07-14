@@ -5,6 +5,7 @@ from yihuier.binning import BinningModule
 from yihuier.cluster import ClusterModule
 from yihuier.data_processing import DataProcessingModule
 from yihuier.eda import EDAModule
+from yihuier.feature_engineering import FeatureEngineeringModule
 from yihuier.model_evaluation import ModelEvaluationModule
 from yihuier.pipeline import PipelineModule
 from yihuier.scorecard_implement import ScorecardImplementModule
@@ -27,6 +28,7 @@ class Yihuier:
         target: 目标变量名
         eda_module: 探索性数据分析模块
         dp_module: 数据处理模块
+        fe_module: 特征工程模块
         cluster_module: 聚类分析模块
         binning_module: 分箱模块
         var_select_module: 变量选择模块
@@ -47,6 +49,7 @@ class Yihuier:
         self.target: str | None = target
         self.eda_module: EDAModule = EDAModule(self)
         self.dp_module: DataProcessingModule = DataProcessingModule(self)
+        self.fe_module: FeatureEngineeringModule = FeatureEngineeringModule(self)
         self.cluster_module: ClusterModule = ClusterModule(self)
         self.binning_module: BinningModule = BinningModule(self)
         self.var_select_module: VarSelectModule = VarSelectModule(self)
