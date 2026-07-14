@@ -255,3 +255,54 @@ def test_gen_transform_reciprocal(yihuier_instance):
         expected.reset_index(drop=True),
         check_names=False,
     )
+
+
+def test_gen_missing_flag_basic(yihuier_instance):
+    """测试缺失指示符：有缺失=1，无缺失=0"""
+    # v1 在 sample_data 中有 5% 缺失
+    result = yihuier_instance.fe_module.gen_missing_flag(['v1'])
+    assert 'miss_v1' in result.columns
+    # 缺失行应为 1
+    missing_mask = yihuier_instance.data['v1'].isna()
+    assert (result.loc[missing_mask, 'miss_v1'] == 1).all()
+    # 非缺失行应为 0
+    present_mask = yihuier_instance.data['v1'].notna()
+    assert (result.loc[present_mask, 'miss_v1'] == 0).all()
+
+
+def test_gen_missing_flag_multiple_cols(yihuier_instance):
+    """测试多列各生成独立 flag"""
+    result = yihuier_instance.fe_module.gen_missing_flag(['v1', 'v2'])
+    assert 'miss_v1' in result.columns
+    assert 'miss_v2' in result.columns
+
+
+def test_gen_missing_flag_custom_prefix(yihuier_instance):
+    """测试自定义前缀"""
+    result = yihuier_instance.fe_module.gen_missing_flag(['v1'], prefix='is_na_')
+    assert 'is_na_v1' in result.columns
+    assert 'miss_v1' not in result.columns
+
+
+def test_gen_missing_flag_preserves_originals(yihuier_instance):
+    """测试原始列保留不变"""
+    original_v1 = yihuier_instance.data['v1'].copy()
+    result = yihuier_instance.fe_module.gen_missing_flag(['v1'])
+    pd.testing.assert_series_equal(result['v1'], original_v1, check_names=False)
+
+
+def test_gen_missing_flag_no_missing():
+    """测试无缺失列全部为 0"""
+    from yihuier.yihuier import Yihuier
+    data = pd.DataFrame({'target': [0, 1, 0], 'x': [1.0, 2.0, 3.0]})
+    yh = Yihuier(data, 'target')
+    result = yh.fe_module.gen_missing_flag(['x'])
+    assert (result['miss_x'] == 0).all()
+
+
+def test_gen_missing_flag_logs_features(yihuier_instance):
+    """测试每个 flag 列都记录到 feature_log"""
+    yihuier_instance.fe_module.gen_missing_flag(['v1', 'v2'])
+    names = [e['name'] for e in yihuier_instance.fe_module.feature_log]
+    assert 'miss_v1' in names
+    assert 'miss_v2' in names

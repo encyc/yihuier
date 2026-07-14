@@ -166,3 +166,27 @@ class FeatureEngineeringModule:
         data[name] = result
         self.feature_log.append({"name": name, "source": col, "method": f"transform:{method}"})
         return data
+
+    def gen_missing_flag(
+        self, cols: list[str], prefix: str = "miss_"
+    ) -> pd.DataFrame:
+        """缺失指示符
+
+        对每列生成独立的 0/1 flag 列：缺失=1，非缺失=0。
+        应在 dp_module.fillna 之前调用。
+
+        Args:
+            cols: 需要生成缺失指示符的列名列表
+            prefix: 新列名前缀，默认 'miss_'，新列名为 {prefix}{col}
+
+        Returns:
+            新增若干 flag 列的 DataFrame（副本）
+        """
+        data = self.yihuier_instance.data.copy()
+        for col in cols:
+            flag_name = f"{prefix}{col}"
+            data[flag_name] = data[col].isna().astype(int)
+            self.feature_log.append(
+                {"name": flag_name, "source": col, "method": "missing_flag"}
+            )
+        return data
