@@ -30,3 +30,39 @@ class FeatureEngineeringModule:
         """
         self.yihuier_instance = yihuier_instance
         self.feature_log: list[dict] = []
+
+    def gen_cross(
+        self, a: str, b: str, op: str, name: str
+    ) -> pd.DataFrame:
+        """通用四则运算交叉特征
+
+        Args:
+            a: 第一个列名
+            b: 第二个列名
+            op: 运算符，支持 '+', '-', '*', '/'
+            name: 新特征列名
+
+        Returns:
+            新增 name 列的 DataFrame（副本）
+
+        Raises:
+            ValueError: op 不在 {'+', '-', '*', '/'} 中时
+        """
+        data = self.yihuier_instance.data.copy()
+
+        if op == "+":
+            result = data[a] + data[b]
+        elif op == "-":
+            result = data[a] - data[b]
+        elif op == "*":
+            result = data[a] * data[b]
+        elif op == "/":
+            # 除零 → NaN（pandas 默认得 inf，这里显式转为 NaN）
+            with np.errstate(divide="ignore", invalid="ignore"):
+                result = data[a] / data[b].replace(0, np.nan)
+        else:
+            raise ValueError(f"不支持的运算符: {op}。必须是 '+', '-', '*', '/' 之一")
+
+        data[name] = result
+        self.feature_log.append({"name": name, "source": (a, b), "method": f"cross:{op}"})
+        return data
